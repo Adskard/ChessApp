@@ -9,11 +9,11 @@ package cz.cvut.fel.skardada.chess;
  *
  * @author Adam Škarda
  */
-public class ChessPiece_Bishop extends ChessPiece{
-
-    public ChessPiece_Bishop() {
-        super(null);
-    }
-    
-    
+public enum ChessPieces {
+    pawn,
+    rook,
+    bishop,
+    knight,
+    queen,
+    king
 }

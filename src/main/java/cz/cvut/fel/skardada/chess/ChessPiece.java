@@ -10,10 +10,13 @@ package cz.cvut.fel.skardada.chess;
  * @author Adam Škarda
  */
 public abstract class ChessPiece {
-    int[] position;
-    String[] moveSet;
-    public ChessPiece(int[] pos) {
-        position = pos;
+    private int[] position;
+    private final MoveSet moveSet;
+    private final PlayerColors color;
+    public ChessPiece(int[] pos, PlayerColors color, MoveSet mov) {
+        this.position = pos;
+        this.color = color;
+        this.moveSet = mov;
     }
     
 }

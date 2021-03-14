@@ -9,10 +9,6 @@ package cz.cvut.fel.skardada.chess;
  *
  * @author Adam Škarda
  */
-public class ChessPiece_Queen extends ChessPiece{
-
-    public ChessPiece_Queen() {
-        super(null);
-    }
-    
+public enum ChessStyle {
+    standard
 }

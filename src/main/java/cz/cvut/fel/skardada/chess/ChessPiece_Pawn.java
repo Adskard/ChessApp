@@ -11,8 +11,14 @@ package cz.cvut.fel.skardada.chess;
  */
 public class ChessPiece_Pawn extends ChessPiece{
 
-    public ChessPiece_Pawn() {
-        super(null);
+    public ChessPiece_Pawn(int[] pos, PlayerColors color) {
+        super(pos, color, new MoveSet( (color==PlayerColors.white ? new int[][]{{0,1}} : new int[][]{{0,-1}}), 1));
+    }
+    public void doublePass(){
+        
+    }
+    public void enPassant(){
+        
     }
     
     

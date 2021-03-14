@@ -11,8 +11,10 @@ package cz.cvut.fel.skardada.chess;
  */
 public class ChessPiece_King extends ChessPiece {
 
-    public ChessPiece_King() {
-        super(null);
+    public ChessPiece_King(int[] pos, PlayerColors color) {
+        super(pos, color, new MoveSet(new int[][]{{1,1},{-1,1},{-1,-1},{1,-1},{1,0},{-1,0},{0,1},{0,-1}}, 1));
     }
-    
+    public void Castle(){
+        
+    }
 }

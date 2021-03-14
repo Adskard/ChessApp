@@ -9,7 +9,7 @@ package cz.cvut.fel.skardada.chess;
  *
  * @author Adam Škarda
  */
-public class Player {
+public abstract class Player {
 
     public Player(String color) {
     }

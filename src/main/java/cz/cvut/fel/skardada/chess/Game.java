@@ -14,21 +14,12 @@ public class Game {
     Board board;
     Player[] players;
     Timer timer;
-    public enum playerColors {
-        white,
-        black
-    }
-    public Game(int boardSize) {
-        this.board = new Board(boardSize);
-        
-    }
+    ChessStyle style;
 
-    public Game(int boardSize, int numberOfPlayers) {
-        this.board = new Board(boardSize);
-        this.players = new Player[numberOfPlayers];
-        for (int i = 0; i < numberOfPlayers; i++) {
-            this.players[i] = new Player( playerColors.values()[i].toString());
-        }
+    public Game(int boardSize) {
+        this.style = ChessStyle.standard;
+        this.board = new Board(this.style);
+        this.players = new Player[2];
         this.timer = new Timer();
     }
     

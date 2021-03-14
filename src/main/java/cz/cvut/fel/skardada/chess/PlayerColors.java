@@ -9,10 +9,7 @@ package cz.cvut.fel.skardada.chess;
  *
  * @author Adam Škarda
  */
-public class ChessPiece_Rook extends ChessPiece{
-
-    public ChessPiece_Rook() {
-        super(null);
-    }
-    
+public enum PlayerColors {
+    white,
+    black
 }
