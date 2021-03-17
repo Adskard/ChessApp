@@ -10,5 +10,5 @@ package cz.cvut.fel.skardada.chess;
  * @author Adam Škarda
  */
 public enum ChessStyle {
-    standard
+    standard ();
 }

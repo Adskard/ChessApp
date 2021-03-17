@@ -10,17 +10,25 @@ package cz.cvut.fel.skardada.chess;
  * @author Adam Škarda
  */
 public class MoveSet {
-    private final int[][] moveVectors;
+    private final Coordinates[] moveVectors;
     private final int moveDistance;
-
+    
     /**
      *
      * @param vectors vectors along which can chess piece move
      * @param distance how many places can a chess piece move
      */
-    public MoveSet(int[][] vectors, int distance) {
+    public MoveSet(Coordinates[] vectors, int distance) {
         this.moveVectors = vectors;
         this.moveDistance = distance;
+    }
+
+    public Coordinates[] getMoveVectors() {
+        return moveVectors;
+    }
+
+    public int getMoveDistance() {
+        return moveDistance;
     }
     
 }

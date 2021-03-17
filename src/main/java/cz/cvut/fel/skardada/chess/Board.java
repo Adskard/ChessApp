@@ -26,19 +26,6 @@ public class Board {
         this.setUpPieces(this.style);
     }
     private void setUpPieces(ChessStyle style){
-        switch(style){
-            case standard:
-            default:
-                int pawnBlack = 6;
-                int specialBlack = 7;
-                int pawnWhite = 1;
-                int specialWhite = 0;
-                for (int i = 0; i < this.size; i++) {
-                    this.board[i][pawnWhite] = new ChessPiece_Pawn(new int[]{i,pawnWhite}, PlayerColors.white);
-                    this.board[i][pawnBlack] = new ChessPiece_Pawn(new int[]{i,pawnBlack}, PlayerColors.black);
-                }
-                break;
-        }
     }
     public int getSize() {
         return size;
