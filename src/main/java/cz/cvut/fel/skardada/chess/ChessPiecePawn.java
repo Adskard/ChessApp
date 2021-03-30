@@ -12,7 +12,9 @@ package cz.cvut.fel.skardada.chess;
 public class ChessPiecePawn extends ChessPiece{
 
     public ChessPiecePawn(Coordinates pos, PlayerColors color) {
-        super(pos, color, new MoveSet((color==PlayerColors.white ? new Coordinates[]{new Coordinates(0,1)} : new Coordinates[]{new Coordinates(0,-1)}), 1));
+        super("Pawn",pos, color, new MoveSet((color==PlayerColors.white ?
+            new Coordinates[]{new Coordinates(0,1)} :
+            new Coordinates[]{new Coordinates(0,-1)}), 1));
     }
     public void doublePass(){
         
@@ -20,6 +22,8 @@ public class ChessPiecePawn extends ChessPiece{
     public void enPassant(){
         
     }
-    
+    public void promotion(){
+        
+    }
     
 }

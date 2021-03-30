@@ -11,24 +11,46 @@ package cz.cvut.fel.skardada.chess;
  */
 public class Board {
     private final int size;
-    private ChessPiece[][] board;
-    ChessPiece[] piecesOnBoard;
-    ChessStyle style;   
-    public Board(int Size){
-        this.size = Size;
-        this.board = new ChessPiece[this.size][this.size];
-    }
+    private ChessPiece[][] board;  
 
-    public Board(ChessStyle style) {
-        this.size = 8;
-        this.style = style;
-        this.board = new ChessPiece[this.size][this.size];
-        this.setUpPieces(this.style);
+    public Board(int size, ChessPiece[][] arrangement) {
+        this.size = size;
+        this.board = arrangement;
     }
-    private void setUpPieces(ChessStyle style){
+    
+    public void update(){
+        for(ChessPiece[] row : this.board){
+            for(ChessPiece piece :row){
+                piece.calculateAvailableMoves(this);
+            }
+        }
+    }
+    
+    public void movePiece(Coordinates startPos, Coordinates dest){
+        if(this.board[startPos.getX()][startPos.getY()] == null){
+            return;
+        }
+        ChessPiece movingPiece = this.board[startPos.getX()][startPos.getY()];
+        if(this.board[dest.getX()][dest.getY()] == null){
+            this.board[dest.getX()][dest.getY()] = movingPiece;
+            movingPiece.setPosition(dest);
+            this.board[startPos.getX()][startPos.getY()] = null;
+        }
+        else{
+            if (this.board[dest.getX()][dest.getY()].getColor() != movingPiece.getColor()) {
+                this.board[dest.getX()][dest.getY()].setPosition(new Coordinates(-1,-1));
+                this.board[dest.getX()][dest.getY()] = movingPiece;
+                movingPiece.setPosition(dest);
+                this.board[startPos.getX()][startPos.getY()] = null;
+            }
+        }
     }
     public int getSize() {
         return size;
+    }
+
+    public ChessPiece[][] getBoard() {
+        return board;
     }
     
 }

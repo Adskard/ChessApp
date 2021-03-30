@@ -9,7 +9,7 @@ package cz.cvut.fel.skardada.chess;
  *
  * @author Adam Škarda
  */
-public class MoveSet {
+public class MoveSet implements java.io.Serializable{
     private final Coordinates[] moveVectors;
     private final int moveDistance;
     

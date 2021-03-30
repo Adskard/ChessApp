@@ -11,17 +11,45 @@ package cz.cvut.fel.skardada.chess;
  */
 import java.util.*;
 public class Game {
-    Board board;
-    Player[] players;
-    Timer timer;
-    ChessStyle style;
+    private final Board gameBoard;
+    private final Player[] players;
+    private final ChessStyle style;
+    private ArrayList<String> turnHistory;
+    private int currPlayerIndex;
 
-    public Game(int boardSize) {
-        this.style = ChessStyle.standard;
-        this.board = new Board(this.style);
+    public Game(ChessStyle style) {
+        this.style = style;
+        this.gameBoard = new Board(this.style.getBoardSize(),this.style.getBoardArrangement());
         this.players = new Player[2];
-        this.timer = new Timer();
+        this.turnHistory = new ArrayList<String>();
+        this.currPlayerIndex = 0;
     }
     
+    public void nextTurn(){
+        Player currPlayer = players[currPlayerIndex++ % players.length];
+        currPlayer.getTimer().start();
+        Coordinates[] move = currPlayer.makeMove(gameBoard);
+        this.gameBoard.movePiece(move[0], move[1]);
+        currPlayer.getTimer().stop();
+    }
+    
+    public void startGame(){
+        Player winner = null;
+        while(winner == null){
+            this.nextTurn();
+        }
+    }
+
+    public Board getGameBoard() {
+        return gameBoard;
+    }
+
+    public Player[] getPlayers() {
+        return players;
+    }
+
+    public ChessStyle getStyle() {
+        return style;
+    }
     
 }

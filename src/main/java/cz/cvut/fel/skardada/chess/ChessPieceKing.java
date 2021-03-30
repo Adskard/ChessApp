@@ -12,7 +12,7 @@ package cz.cvut.fel.skardada.chess;
 public class ChessPieceKing extends ChessPiece {
 
     public ChessPieceKing(Coordinates pos, PlayerColors color) {
-        super(pos, color, new MoveSet(new Coordinates[]{
+        super("King",pos, color, new MoveSet(new Coordinates[]{
             new Coordinates(1,1),
             new Coordinates(-1,-1),
             new Coordinates(-1,1),
@@ -22,6 +22,10 @@ public class ChessPieceKing extends ChessPiece {
             new Coordinates(0,-1),
             new Coordinates(-1,0)
         }, 1));
+    }
+    
+    public void check(){
+        
     }
     public void Castle(){
         

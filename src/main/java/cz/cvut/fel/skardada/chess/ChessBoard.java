@@ -16,8 +16,9 @@ public class ChessBoard extends javax.swing.JFrame {
      */
     Game game;
     public ChessBoard(Game game) {
-        initComponents();
         this.game = game;
+        initComponents();
+        
     }
 
     /**
@@ -35,15 +36,8 @@ public class ChessBoard extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+            this.game.getGameBoard().getBoard(),
+            new String[]{"1","2","3","4","5","6","7","8"}
         ));
         jScrollPane1.setViewportView(jTable1);
 
