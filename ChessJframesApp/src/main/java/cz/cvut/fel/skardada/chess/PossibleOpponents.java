@@ -9,6 +9,8 @@ package cz.cvut.fel.skardada.chess;
  *
  * @author Adam Škarda
  */
-public class Control {
-    
+public enum PossibleOpponents {
+    local,
+    computer,
+    internet,
 }

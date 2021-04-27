@@ -12,15 +12,14 @@ import java.util.ArrayList;
  * @author Adam Škarda
  */
 public class Player_Human extends Player {
+    
 
-    public Player_Human(PlayerColors color, ArrayList<ChessPiece> ownPieces) {
-        super(color, ownPieces);
+    public Player_Human(String name, PlayerColors color, ArrayList<ChessPiece> ownPieces, ChessClock clock) {
+        super(name, color, ownPieces, clock);
     }
-    public Coordinates[] makeMove(Board currentBoard){
-        Coordinates[] move = new Coordinates[2];
-        //mb move to implementation
-        //decisions
-        //if after move player is checked, then player, CANNOT make the move
-        return move;
+    public void makeMove(Board currentBoard){
+        this.setCurrentlyPlaying(true);
     }
+
+    
 }

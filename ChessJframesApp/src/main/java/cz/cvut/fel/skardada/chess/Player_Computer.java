@@ -13,15 +13,17 @@ import java.util.ArrayList;
  */
 public class Player_Computer extends Player{
 
-    public Player_Computer(PlayerColors color, ArrayList<ChessPiece> ownPieces) {
-        super(color, ownPieces);
+    public Player_Computer(String name, PlayerColors color, ArrayList<ChessPiece> ownPieces, ChessClock clock) {
+        super(name, color, ownPieces, clock);
     }
-    public Coordinates[] makeMove(Board currentBoard){
+
+  
+    public void makeMove(Board currentBoard){
         Coordinates[] move = new Coordinates[2];
         //mb move to implementation
         //decisions
         //if after move player is checked, then player, CANNOT make the move
-        return move;
+        return;
     }
 
 

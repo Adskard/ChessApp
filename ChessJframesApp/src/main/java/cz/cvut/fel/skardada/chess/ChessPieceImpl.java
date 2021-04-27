@@ -5,18 +5,19 @@
  */
 package cz.cvut.fel.skardada.chess;
 
+import java.awt.image.BufferedImage;
 /**
  *
  * @author Adam Škarda
  */
 public class ChessPieceImpl extends ChessPiece{
 
-    public ChessPieceImpl(String name, Coordinates pos, PlayerColors color, MoveSet mov) {
-        super(name, pos, color, mov);
+    public ChessPieceImpl(ChessPiece piece) {
+        super(piece);
     }
 
-    public ChessPieceImpl(MoveSet moveSet, String name) {
-        super(moveSet, name);
+    public ChessPieceImpl(String name, Coordinates pos, PlayerColors color, MoveSet mov, String imagePath) {
+        super(name, pos, color, mov, imagePath);
     }
     
 }

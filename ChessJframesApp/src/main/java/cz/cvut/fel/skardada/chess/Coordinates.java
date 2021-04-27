@@ -29,9 +29,9 @@ public class Coordinates implements java.io.Serializable{
      */
     @Override
     public String toString(){
-        String str = new String();
+        String str;
         int offset = 97;
-        str = Integer.toString((this.y + 1)) +  (char)(this.x + offset);
+        str =  (char)(offset + this.y) + Integer.toString((this.x + 1));
         return str;
     }
 

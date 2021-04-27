@@ -1,4 +1,12 @@
--n Knight -v 2,1 2,-1 -2,-1 -2,1 1,2 1,-2 -1,2 -1,-2  -d 1
--n Bishop -v 1,1 1,-1 -1,1 -1,-1 -d -1
--n Queen -v 1,1 1,-1 -1,1 -1,-1 0,-1 1,0 0,1 -1,0 -d -1
--n Rook -v 0,-1 1,0 0,1 -1,0  -d -1
+-n whiteKnight -v 2,1 2,-1 -2,-1 -2,1 1,2 1,-2 -1,2 -1,-2  -d 1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\whiteKnight.png"
+-n whiteBishop -v 1,1 1,-1 -1,1 -1,-1 -d -1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\whiteBishop.png"
+-n whiteQueen -v 1,1 1,-1 -1,1 -1,-1 0,-1 1,0 0,1 -1,0 -d -1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\whiteQueen.png"
+-n whiteRook -v 0,-1 1,0 0,1 -1,0  -d -1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\whiteRook.png"
+-n blackKnight -v 2,1 2,-1 -2,-1 -2,1 1,2 1,-2 -1,2 -1,-2  -d 1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\blackKnight.png"
+-n blackBishop -v 1,1 1,-1 -1,1 -1,-1 -d -1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\blackBishop.png"
+-n blackQueen -v 1,1 1,-1 -1,1 -1,-1 0,-1 1,0 0,1 -1,0 -d -1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\blackQueen.png"
+-n blackRook -v 0,-1 1,0 0,1 -1,0  -d -1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\blackRook.png"
+
+standard style
+-n standard  -s 8  -p wRook*1 wKnight*1 wBishop*1 wKing*1 wQueen*1 wBishop*1  wKnight*1 wRook*1 wPawn*8 -1*32 bPawn*8 bRook*1  bKnight*1  bBishop*1 bKing*1 bQueen*1  bBishop*1  bKnight*1  bRook*1
+-n standard  -s 8  -p wKing*1 wPawn*1 -1*60 bPawn*1 bKing*1

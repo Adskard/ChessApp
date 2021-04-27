@@ -19,26 +19,52 @@ public abstract class ChessPiece implements java.io.Serializable{
     private ArrayList<Coordinates> availableMoves;
     private ArrayList<Coordinates> legalMoves;
     private int id;
+    private final String imagePath;
     
-    public ChessPiece(String name,Coordinates pos, PlayerColors color, MoveSet mov) {
+    public ChessPiece(String name,Coordinates pos, PlayerColors color, MoveSet mov, String imagePath) {
         this.position = pos;
         this.name = name;
         this.color = color;
         this.moveSet = mov;
+        this.availableMoves = new ArrayList();
+        this.legalMoves = new ArrayList();
+        this.imagePath = imagePath;
+    }
+    
+    //copy constructor
+    public ChessPiece(ChessPiece piece){
+        this.moveSet = piece.getMoveSet();
+        this.name = piece.getName();
+        this.id = piece.getId();
+        this.imagePath = piece.imagePath;
+        this.color = piece.getColor();
+        this.position = piece.getPosition();
+        this.availableMoves = piece.availableMoves;
+        this.legalMoves = new ArrayList();
     }
 
     public int getId() {
         return id;
     }
+    
+    @Override
+    public boolean equals(Object o ){
+        if(o == null){
+            return false;
+        }
+        if(! (o instanceof ChessPiece)){
+        return false;
+        }
+        ChessPiece p = (ChessPiece) o;
+        if(p.getId() == this.getId()){
+            return true;
+        }
+        return false;
+    }
 
     public void setId(int id) {
         this.id = id;
     }
-
-    public ChessPiece(MoveSet moveSet, String name) {
-        this.moveSet = moveSet;
-        this.name = name;
-    }   
     
     public boolean canGetTo(Coordinates dest){
         for (Coordinates pos : this.availableMoves) {
@@ -93,5 +119,7 @@ public abstract class ChessPiece implements java.io.Serializable{
     public void setLegalMoves(ArrayList<Coordinates> legalMoves) {
         this.legalMoves = legalMoves;
     }
-    
+    public String getImagePath() {
+        return imagePath;
+    }
 }

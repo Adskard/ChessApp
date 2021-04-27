@@ -10,16 +10,15 @@ package cz.cvut.fel.skardada.chess.ChessStyles;
  * @author Adam Škarda
  */
 import cz.cvut.fel.skardada.chess.ChessPiece;
-import cz.cvut.fel.skardada.chess.ChessPieceImpl;
 import cz.cvut.fel.skardada.chess.ChessPieceKing;
 import cz.cvut.fel.skardada.chess.ChessPiecePawn;
 import cz.cvut.fel.skardada.chess.ChessStyle;
 import cz.cvut.fel.skardada.chess.Coordinates;
 import cz.cvut.fel.skardada.chess.IncorrectLenghtException;
-import cz.cvut.fel.skardada.chess.MoveSet;
 import cz.cvut.fel.skardada.chess.PlayerColors;
 import java.io.*;
 import org.apache.commons.cli.*;
+import java.awt.image.BufferedImage;
 public class StyleMaker {
 
     public static void main(String[] args){
@@ -72,8 +71,9 @@ public class StyleMaker {
         board = new ChessPiece[size][size];
         
         //setting up chess pieces for usage
-        String styleDirectory = ".\\src\\main\\java\\cz\\cvut\\fel\\skardada\\chess\\ChessStyles\\";
-        String pieceDirectory = ".\\src\\main\\java\\cz\\cvut\\fel\\skardada\\chess\\ChessPieces\\";
+        //PATHS ARE IMPORTANT THEY ARE WRONG HERE THEY NEEED TO EXIST
+        String styleDirectory = ".\\ChessJframesApp\\src\\main\\java\\cz\\cvut\\fel\\skardada\\chess\\ChessStyles\\";
+        String pieceDirectory = ".\\ChessJframesApp\\src\\main\\java\\cz\\cvut\\fel\\skardada\\chess\\ChessPieces\\";
         String piecePrefix = "piece_";
         String pieceSuffix = ".ser";
         String[] availablePieces = null;
@@ -93,6 +93,8 @@ public class StyleMaker {
             System.err.println("Chess pieces directory error " + ex.getMessage());
             System.exit(-1);
         }
+        
+        
         
         //Filling the chess board
         String[] piecePositions = cmd.getOptionValues(positioningOption.getOpt());
@@ -136,24 +138,36 @@ public class StyleMaker {
                 numberOfIdenticalPieces--;
                 switch(pieceName){
                     case "King":
-                        board[i][j]=new ChessPieceKing(new Coordinates(i,j),color);
+                        try{
+                           board[i][j]=new ChessPieceKing(new Coordinates(i,j),color); 
+                        }
+                        catch(Exception e){
+                            System.err.println("Path to image doesnt exist " + e.getMessage());
+                        }
+                        
                         break;
                     case "Pawn":
-                        board[i][j]=new ChessPiecePawn(new Coordinates(i,j),color);
+                        try{
+                           board[i][j]=new ChessPiecePawn(new Coordinates(i,j),color); 
+                        }
+                        catch(Exception e){
+                            System.err.println("Path to image doesnt exist " + e.getMessage());
+                        }
                         break;
                     case "-1":
                         board[i][j] = null;
                         break;
                     default:
                         for (File currFile : availablePieceFiles) {
-                            String nameFromInput = currFile.getName().substring(
+                            String nameFromSerializedPieces = currFile.getName().substring(
                                 piecePrefix.length(), currFile.getName().length() - pieceSuffix.length());
-                            if(pieceName.equals(nameFromInput)){
+                            if(nameFromSerializedPieces.equals(color.toString() + pieceName)){
                                 //deserialize
                                 try{
                                     FileInputStream file = new FileInputStream(currFile.getAbsolutePath());
                                     ObjectInputStream in = new ObjectInputStream(file);
                                     board[i][j] = (ChessPiece) in.readObject();
+                                    board[i][j].setPosition(new Coordinates(i,j));
                                     in.close();
                                     file.close();
                                 }
@@ -187,7 +201,7 @@ public class StyleMaker {
             System.out.println("Data has been succesfully serialized");
         }
         catch(IOException ex){
-            System.err.println("Could not serialize" + ex.getMessage());
+            System.err.println("Could not serialize " + ex.getMessage());
             System.exit(-1);
         }
     }

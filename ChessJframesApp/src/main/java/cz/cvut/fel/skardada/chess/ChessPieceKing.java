@@ -5,17 +5,17 @@
  */
 package cz.cvut.fel.skardada.chess;
 
-import java.util.ArrayList;
-
+import javax.imageio.*;
+import java.io.File;
 /**
  *
  * @author Adam Škarda
  */
 public class ChessPieceKing extends ChessPiece {
-    private boolean canCastle;
+    private boolean checked;
 
-    public ChessPieceKing(Coordinates pos, PlayerColors color) {
-        super("King",pos, color, new MoveSet(new Coordinates[]{
+    public ChessPieceKing(Coordinates pos, PlayerColors color)  throws Exception{
+        super(color + "King",pos, color, new MoveSet(new Coordinates[]{
             new Coordinates(1,1),
             new Coordinates(-1,-1),
             new Coordinates(-1,1),
@@ -24,6 +24,24 @@ public class ChessPieceKing extends ChessPiece {
             new Coordinates(0,1),
             new Coordinates(0,-1),
             new Coordinates(-1,0)
-        }, 1));
+        }, 1),
+
+            "D:\\Projects\\Java\\ChessJframesApp\\ChessJframesApp\\src\\main\\java\\resources\\"+color.toString()+"King.png"
+                );
+        this.checked = false;
     }
+
+    public ChessPieceKing(ChessPiece piece) {
+        super(piece);
+        this.checked = false;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
+    
 }

@@ -13,64 +13,81 @@ import java.util.ArrayList;
  */
 public abstract class Player {
     private final PlayerColors color;
-    private Timer timer;
     private boolean checked;
-    private ArrayList<ChessPiece> ownPieces;
-    private ChessPiece king;
+    private final ArrayList<ChessPiece> ownPieces;
     private ArrayList<Coordinates> availableMoves;
-    public Player(PlayerColors color, ArrayList<ChessPiece> ownPieces) {
+    private ChessClock clock;
+    private boolean currentlyPlaying;
+    private boolean finishedTurn;
+    private String name;
+    
+    public Player(String name, PlayerColors color, ArrayList<ChessPiece> ownPieces, ChessClock clock) {
         this.color = color;
         this.ownPieces = ownPieces;
         this.availableMoves = new ArrayList<>();
+        this.clock = clock;
+        this.currentlyPlaying = false;
+        this.finishedTurn = false;
+        this.name = name;
     }
     
-    public abstract Coordinates[] makeMove(Board currentBoard);
+    public abstract void makeMove(Board currentBoard);
     
-    public void findAvailableMoves(){
-        availableMoves.clear();
-        for(ChessPiece piece : ownPieces){
-            availableMoves.addAll(piece.getAvailableMoves());
-        }
-    }
-    
-    public void isChecked(Board board){
-        ChessPiece[][] pieces = board.getBoard();
-        for(ChessPiece[] row : pieces){
-            for(ChessPiece piece : row){
-                if(piece == null){
-                    continue;
-                }
-                if(piece.getColor().equals(this.color)){
-                    continue;
-                }
-                //enemy piece
-                else{
-                    for(Coordinates target : piece.getAvailableMoves()){
-                        if(this.king.getPosition().equals(target)){
-                            this.checked = true;
-                        }
-                    }
-                }
-            }
-        }
-        this.checked = false;
-    }
-    
-    public boolean isMated(Board board){
-        if(this.checked && this.king.getAvailableMoves() == null){
+    public boolean isMated(){
+        if((this.isChecked() && this.availableMoves.isEmpty()) || this.clock.getRemainingTime() <= 0){
             return true;
         }
         return false;
     }
+    
+    public void updateAvailableMoves(){
+        this.availableMoves.clear();
+        for(ChessPiece piece : this.ownPieces){
+            this.availableMoves.addAll(piece.getLegalMoves());
+        }
+    }
+    
+    public ArrayList<ChessPiece> getKnockedOutPieces(){
+        ArrayList<ChessPiece> knockedOutPieces = new ArrayList<>();
+        for(ChessPiece piece : this.ownPieces){
+            if(piece.getPosition().getX() == -1){
+                knockedOutPieces.add(piece);
+            }
+        }
+        return knockedOutPieces;
+    }
+    
+    public boolean isChecked(){ 
+        //find king chessPiece - ask it if its in check 
+        for (ChessPiece piece : this.ownPieces) {
+            if(piece instanceof ChessPieceKing){
+                ChessPieceKing king = (ChessPieceKing) piece;
+                if(king.isChecked()){
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
+    }
 
-    public Timer getTimer() {
-        return timer;
+    public boolean getFinishedTurn() {
+        return finishedTurn;
+    }
+
+    public void setFinishedTurn(boolean madeAMove) {
+        this.finishedTurn = madeAMove;
     }
 
     public PlayerColors getColor() {
         return color;
     }
-    
-    
-    
+    public boolean isCurrentlyPlaying() {
+        return currentlyPlaying;
+    }
+
+    public void setCurrentlyPlaying(boolean currentlyPlaying) {
+        this.currentlyPlaying = currentlyPlaying;
+    }
+
 }
