@@ -13,7 +13,6 @@ import java.util.ArrayList;
  */
 public abstract class Player {
     private final PlayerColors color;
-    private boolean checked;
     private final ArrayList<ChessPiece> ownPieces;
     private ArrayList<Coordinates> availableMoves;
     private ChessClock clock;
@@ -42,9 +41,15 @@ public abstract class Player {
     
     public void updateAvailableMoves(){
         this.availableMoves.clear();
+        ArrayList<ChessPiece> removedPieces = new ArrayList();
         for(ChessPiece piece : this.ownPieces){
+            if(piece.getPosition().getX() == -1){
+                removedPieces.add(piece);
+                continue;
+            }
             this.availableMoves.addAll(piece.getLegalMoves());
         }
+        this.ownPieces.removeAll(removedPieces);
     }
     
     public ArrayList<ChessPiece> getKnockedOutPieces(){
@@ -90,4 +95,23 @@ public abstract class Player {
         this.currentlyPlaying = currentlyPlaying;
     }
 
+    public ChessClock getChessClock(){
+        return clock;
+    }
+
+    public ArrayList<ChessPiece> getOwnPieces() {
+        return ownPieces;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ArrayList<Coordinates> getAvailableMoves() {
+        return availableMoves;
+    }
+
+    public ChessClock getClock() {
+        return clock;
+    }
 }

@@ -17,7 +17,6 @@ public class MainView extends javax.swing.JFrame {
     private String p2time;
     private String p1incrementTime;
     private String p2incrementTime;
-    private boolean sameTime;
     private PlayerColors p1color;
     private PlayerColors p2color;
     private PossibleOpponents p1Type;

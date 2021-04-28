@@ -6,8 +6,6 @@
 package cz.cvut.fel.skardada.chess;
 
 import java.io.*;
-import java.util.ResourceBundle;
-import java.util.concurrent.*;
 import java.util.ArrayList;
 import java.util.logging.*;
 /**
@@ -57,7 +55,7 @@ public class ChessController implements Runnable{
         mainView.setVisible(false);
         
         //Initialize game board view
-        this.boardView = new BoardView(this.game.getGameBoard());
+        this.boardView = new BoardView(this.game);
         
         //wait for the board to initialize
         synchronized(this){
@@ -134,47 +132,60 @@ public class ChessController implements Runnable{
         while(winner == null){
             
             Player currentPlayer = players.get(currentPlayerIndex);
-            
             //diagnostic fucntions
             printBoard();
             System.out.println("Current player: " + currentPlayer.getColor().toString());
             
             //remove CheckMated player, decide winner of the game
+            ArrayList<Player> playersToRemove = new ArrayList();
             for(Player p : players){
                 p.updateAvailableMoves();
+                System.out.println(p.getColor() + " " + p.getAvailableMoves() + " " + p.getOwnPieces());
                 if(p.isMated()){
                     System.out.println(p.getColor() + " mated");
-                    players.remove(p);
+                    playersToRemove.add(p);
+                }
+                else{
+                    if(p.getAvailableMoves().isEmpty()){
+                        System.out.println("DRAW");
+                        return; 
+                    }
                 }
             }
+            players.removeAll(playersToRemove);
             if(players.size() == 1){
                 winner = players.get(0);
+                System.out.println("WINNER IS PLAYER "+ players.get(0).getColor());
+                return;
             } 
             //TODO - add draw options
                 
             //threefold repetiotion
-
+            
             //no available moves 
             
             else{
                 synchronized(this){
                     boardView.setCurrentPlayer(currentPlayer);
-                    currentPlayer.updateAvailableMoves();
+                    currentPlayer.getChessClock().clockStart();
                     currentPlayer.setFinishedTurn(false);
                     currentPlayer.makeMove(game.getGameBoard());
                     while(!currentPlayer.getFinishedTurn()){
+                        this.boardView.updateClocks();
                         try{
                            this.wait(10); 
+                            System.out.println("waiting for move input");
                         }
                         catch(Exception e){
                             System.err.println(e.getMessage() + " " + Thread.currentThread().getName());
                         }
                     } 
+                    currentPlayer.getChessClock().clockStop();
                 }
             }
+            this.boardView.repaintFromModel();
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         }
-        System.out.println("WINNER IS PLAYER "+ players.get(0).getColor());
     } 
     
     private ArrayList getPlayerPieces(PlayerColors color, ChessStyle style){
@@ -207,6 +218,7 @@ public class ChessController implements Runnable{
         }
         System.out.println("]");
     }
+    
 
     private ChessStyle loadGameStyle(String stylePath){
         //Get better pathing TODO

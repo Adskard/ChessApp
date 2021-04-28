@@ -15,11 +15,13 @@ public class Board {
     private final int size;
     private final ChessPiece[][] board; 
     private final TurnHistory history; 
+    private final ArrayList<ChessPiece> uniquePieces;
 
     public Board(int size, ChessPiece[][] arrangement) {
         this.size = size;
         this.board = arrangement;
         this.history = new TurnHistory();
+        this.uniquePieces = findUniques(this);
         this.distributeIds();
     }
     
@@ -28,6 +30,8 @@ public class Board {
         this.history = new TurnHistory(original.getHistory());
         this.size = original.getSize();
         this.board = new ChessPiece[size][size];
+        this.uniquePieces = new ArrayList();
+        uniquePieces.addAll(original.getUniquePieces());
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (original.getBoard()[i][j] == null) {
@@ -68,7 +72,6 @@ public class Board {
     public void updatePieces(){
         updateAvailableMoves();
         updateChecks();
-        System.out.println("--- END OF NORMAL UPDATE ---");
         updateLegalMoves();
         
     }
@@ -115,6 +118,7 @@ public class Board {
             return;
         }
         ChessPiece movingPiece = this.getChessPieceAtCoordinate(startPos);
+        
         //enpassant
         if (movingPiece instanceof ChessPiecePawn && FutureStatesGen.checkEnPassant(this, (ChessPiecePawn)movingPiece) != null && FutureStatesGen.checkEnPassant(this, (ChessPiecePawn)movingPiece).equals(dest)) {
             //remove enPassanted pawn
@@ -122,6 +126,7 @@ public class Board {
             this.getChessPieceAtCoordinate(enemyPawnCoord).setPosition(new Coordinates(-1,-1));
             this.board[enemyPawnCoord.getX()][enemyPawnCoord.getY()] = null; 
         }
+        
         //move rook for castles
         if (movingPiece instanceof ChessPieceKing && !FutureStatesGen.checkCastle(this, (ChessPieceKing)movingPiece).isEmpty()) {
             ArrayList<Coordinates> castleLocations = FutureStatesGen.checkCastle(this, (ChessPieceKing)movingPiece);
@@ -168,15 +173,19 @@ public class Board {
                 this.board[startPos.getX()][startPos.getY()] = null;
             }
         }
-        history.addEntry(movingPiece, dest);
-        System.out.println("HISTORY "+history.getDestinations());
+        
+        //Promotion
+        if (movingPiece instanceof ChessPiecePawn && (movingPiece.getPosition().getX() == this.size -1 || movingPiece.getPosition().getX() == 0)) {
+            ChessPiecePawn promotable = (ChessPiecePawn) movingPiece;
+            promotable.setCanBePromoted(true);
+        }
+        history.addEntry(movingPiece, dest);;
         updatePieces();
     }
     
     //for generating future board states and recursion control
     public void movePieceWithoutUpdatingLegalMoves(Coordinates startPos, Coordinates dest){
         //trying to move nonexistent piece
-        System.out.println("MOVING " + startPos + " TO " + dest);
         if(this.getChessPieceAtCoordinate(startPos) == null){
             return;
         }
@@ -210,7 +219,6 @@ public class Board {
         history.addEntry(movingPiece, dest);
         updateAvailableMoves();
         updateChecks();
-        System.out.println("--- END OF FUTURE ---");
     }
     
     public ChessPiece getChessPieceAtPosition(int x, int y){
@@ -221,6 +229,46 @@ public class Board {
         else{
             return this.board[x][y];
         }
+    }
+    
+    public ChessPiece promotion(ChessPiece promoted, ChessPiece newRank){
+        if(promoted.getColor() != newRank.getColor()){
+            return null;
+        }
+        Coordinates coords = promoted.getPosition();
+        int id = promoted.getId();
+        ChessPiece promotedPiece = new ChessPieceImpl(newRank);
+        promotedPiece.setId(id);
+        promotedPiece.setPosition(coords);
+        promotedPiece.setColor(promoted.getColor());
+        this.getBoard()[coords.getX()][coords.getY()] = promotedPiece;
+        
+        promoted = promotedPiece;
+        
+        this.updatePieces();
+        System.out.println("PROMOTION TO " + coords + " " + promoted.getName());
+        return promotedPiece;
+    }
+    
+    private ArrayList<ChessPiece> findUniques(Board board){
+        ArrayList<ChessPiece> unique = new ArrayList<ChessPiece>();
+        for(ChessPiece[] row : board.getBoard()){
+            for(ChessPiece piece : row){
+                if (piece == null) {
+                    continue;
+                }
+                boolean contains = true;
+                for(ChessPiece uniquePiece : unique){
+                    if(piece.getName().equals(uniquePiece.getName())){
+                        contains = false;
+                    }
+                }
+                if(contains && piece instanceof ChessPieceImpl){
+                    unique.add(piece);
+                }
+            }
+        }
+        return unique;
     }
     
     public ChessPiece getChessPieceAtCoordinate(Coordinates coord){
@@ -237,6 +285,10 @@ public class Board {
 
     public TurnHistory getHistory() {
         return history;
+    }
+    
+    public ArrayList<ChessPiece> getUniquePieces() {
+        return uniquePieces;
     }
     
 }

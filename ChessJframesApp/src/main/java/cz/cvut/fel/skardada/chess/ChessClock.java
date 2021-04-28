@@ -9,66 +9,83 @@ package cz.cvut.fel.skardada.chess;
  *
  * @author Adam Škarda
  */
-public class ChessClock {
-    private long startTime;
-    private long timer;
-    private long end;
-    private long increment;
+public class ChessClock implements Runnable{
+    private long  timer;
+    private long  increment;
     private boolean timeFlows = false;
-    
-    public ChessClock(long clock){
-        startTime = System.currentTimeMillis();
-        end = startTime + clock;
-        this.timer = clock;
-        System.out.println(Long.toString(this.startTime));
-        System.out.println(Long.toString(this.timer));
-        System.out.println(Long.toString(this.end));
-    }
-    
-    public ChessClock(String clock){
-        startTime = System.currentTimeMillis();
-        timer = timeFromString(clock);
-        end = startTime + timer;
-        System.out.println("Clock start: "+Long.toString(this.startTime));
-        System.out.println("Clock timer: "+Long.toString(this.timer));
-        System.out.println("Clock end: "+Long.toString(this.end));
-    }
+    private Thread clockThread = null;
     
     public ChessClock(String clock, String increment){
-        
+        this.timer = this.convertStringToLong(clock);
+        this.increment = this.convertStringToLong(increment);
+    }
+    
+    public void clockStart(){
+        this.timeFlows = true;
+        if(clockThread == null){
+            clockThread = new Thread(this, "ChessClock");
+            clockThread.start();
+        }
+    } 
+    
+    public void clockStop(){
+        if (timeFlows) {
+            timeFlows = false;
+        }
+        timer += increment;
+    }
+    
+    public void run(){
+        while(timer > 0){
+            long then = System.currentTimeMillis();
+            try{     
+                Thread.sleep(1000); 
+            }
+            catch(InterruptedException ex){
+                System.err.println("Exception in Thread" + Thread.currentThread());
+            }
+            long now = System.currentTimeMillis();
+
+            timer -= (now-then);  
+            while(!this.timeFlows){
+                try{     
+                    Thread.sleep(10); 
+                }
+                catch(InterruptedException ex){
+                    System.err.println("Exception in Thread" + Thread.currentThread());
+                }
+            }
+        }
     }
     
     public long getRemainingTime(){
-        this.timeFlows = true;
-        timer = this.end - System.currentTimeMillis();
-        return 234567;
+        return timer;
     }
     
-    private long timeFromString(String time){
-        String[] pieces = time.split(":");
-        long trueTime = 0;
-        for (int i =  pieces.length; i >= 0; i--) {
-            //hours, second minutes
-            if(i == 0){
-                trueTime += Integer.parseInt(pieces[i])*1000;
-            }
-            if(i == 1){
-                trueTime += Integer.parseInt(pieces[i])*1000*60;
-            }
-            if(i == 2){
-                trueTime += Integer.parseInt(pieces[i])*1000*60*60;
-            }
-            else{
-                break;
-            }
+    public String getRemainingSeconds(){
+        long seconds = timer / 1000;
+        long s = seconds % 60;
+        long m = ((seconds - s) / 60) % 60;
+        long h = (( m ) / 60) % 60;
+        String sec = Long.toString(s);
+        String min = Long.toString(m);
+        String hour = Long.toString(h);
+        return hour + ":" + min + ":" + sec;
+    }
+    
+    private long convertStringToLong(String input){
+        long output = 0;
+        String[] timeParts = input.split(":");
+        for (int i = 0; i < timeParts.length; i++) {
+            output += Long.parseLong(timeParts[i]) * 1000 * Math.pow(60, timeParts.length - 1 - i);
         }
-        return trueTime;
-    }
-    
-    @Override
-    public String toString(){
-        String repr = "";
-        
-        return repr;
+        return output;
     }
 }
+
+
+
+
+
+
+

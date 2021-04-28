@@ -19,8 +19,8 @@ public class Coordinates implements java.io.Serializable{
      * @param y
      */
     public Coordinates(int x,int y) {
-        this.x = x;
-        this.y = y;
+        this.x = x; //row
+        this.y = y; //column
     }
 
     /**

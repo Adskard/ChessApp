@@ -22,6 +22,8 @@ public class Game {
         this.gameBoard.updatePieces();
         this.players = players;
     }
+    
+    
 
     public Board getGameBoard() {
         return gameBoard;
@@ -34,5 +36,6 @@ public class Game {
     public ChessStyle getStyle() {
         return style;
     }
+
     
 }

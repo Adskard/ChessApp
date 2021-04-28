@@ -30,6 +30,7 @@ public class FutureStatesGen {
                 //echeck if enemy pieces can get to king
                 else{ 
                     if(piece.canGetTo(king.getPosition())){
+                        System.out.println(king.getPosition() + " checked by " + piece.getPosition());
                         return true;
                     }
                 }
@@ -83,7 +84,8 @@ public class FutureStatesGen {
             }
         }
         
-        legalMoves.removeAll(destinationsToRemove);    
+        legalMoves.removeAll(destinationsToRemove); 
+        
         return legalMoves;
     }
     
@@ -125,10 +127,12 @@ public class FutureStatesGen {
             if(!availableMoves.isEmpty() && board.getChessPieceAtCoordinate(availableMoves.get(moveForwardIndex)) != null){
                 availableMoves.remove(moveForwardIndex);
             }
+            
             Coordinates dest = checkEnPassant(board, pawn);
             if (dest != null) {
                 availableMoves.add(dest);
             }
+            
             dest = checkDoublePawn(board, pawn);
             if (dest != null) {
                 availableMoves.add(dest);
@@ -167,8 +171,6 @@ public class FutureStatesGen {
                 
                 //destination square is move from pawn moves set plus proper vector to get into target pawn column
                 Coordinates dest = pawn.getPosition().getSum(pawn.getMoveSet().getMoveVectors()[0].getSum(new Coordinates(0,lastPlayedPawn.getPosition().getY() - pawn.getPosition().getY())));
-                System.out.println("EN PASSANT " + dest + lastPlayedPawn.getPosition());
-                pawn.getAvailableMoves().add(dest);
                 return dest;
             }
         }
@@ -232,7 +234,6 @@ public class FutureStatesGen {
                             for(ChessPiece piece :row){
 
                                 if(piece != null && piece.getColor() != king.getColor() && piece.canGetTo(inBetweenSquare)){
-                                    System.out.println(king.getName() + " can Castle");
                                     rooksToRemove.add(rook);
                                 }
                             }
@@ -246,7 +247,6 @@ public class FutureStatesGen {
         }
         
         sameColorRooks.removeAll(rooksToRemove);
-        System.out.println(sameColorRooks);
         for(ChessPiece rook : sameColorRooks){
             if(rook.getPosition().getY() > king.getPosition().getY()){
                 destinationSquares.add(new Coordinates(king.getPosition().getX(), king.getPosition().getY()+distanceTraveledByKing));
