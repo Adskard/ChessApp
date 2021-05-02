@@ -30,7 +30,6 @@ public class FutureStatesGen {
                 //echeck if enemy pieces can get to king
                 else{ 
                     if(piece.canGetTo(king.getPosition())){
-                        System.out.println(king.getPosition() + " checked by " + piece.getPosition());
                         return true;
                     }
                 }

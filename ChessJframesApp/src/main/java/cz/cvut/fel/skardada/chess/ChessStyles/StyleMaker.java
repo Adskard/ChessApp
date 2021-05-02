@@ -9,19 +9,13 @@ package cz.cvut.fel.skardada.chess.ChessStyles;
  *
  * @author Adam Škarda
  */
-import cz.cvut.fel.skardada.chess.ChessPiece;
-import cz.cvut.fel.skardada.chess.ChessPieceKing;
-import cz.cvut.fel.skardada.chess.ChessPiecePawn;
-import cz.cvut.fel.skardada.chess.ChessStyle;
-import cz.cvut.fel.skardada.chess.Coordinates;
-import cz.cvut.fel.skardada.chess.IncorrectLenghtException;
-import cz.cvut.fel.skardada.chess.PlayerColors;
+import cz.cvut.fel.skardada.chess.*;
 import java.io.*;
 import org.apache.commons.cli.*;
-import java.awt.image.BufferedImage;
 public class StyleMaker {
 
     public static void main(String[] args){
+        //varibles for style creation
         ChessStyle style = null;
         String name;
         int size = 0;
@@ -34,20 +28,23 @@ public class StyleMaker {
         CommandLineParser parser = new BasicParser();
         HelpFormatter help = new HelpFormatter();
         
+        //style name
         Option nameOption = new Option("n", "name", true, "set style name : string");
         nameOption.setRequired(true);
         options.addOption(nameOption);
         
+        //size of the square board
         Option sizeOption = new Option("s", "size", true, "set board size for this style : int");
         sizeOption.setRequired(true);
         options.addOption(sizeOption);
         
+        //setting up pieces
         Option positioningOption = new Option("p", "position", true, "setting positions for individual pieces  from index 0 to sizeIndex - pieceName_numberOfPieces - blank is -1 * how many consecutive identical positions, max 128 positions");
         positioningOption.setRequired(true);
         positioningOption.setArgs(128);
         options.addOption(positioningOption);
         
-        //interpreting input
+        //parsing input
         try{
             cmd = parser.parse(options, args);
         }
@@ -58,8 +55,10 @@ public class StyleMaker {
             System.exit(-1);
         }
         
+        //get style name
         name = cmd.getOptionValue(nameOption.getOpt());
         
+        //get size
         try{
             size = Integer.parseInt(cmd.getOptionValue(sizeOption.getOpt()));
         }
@@ -71,22 +70,21 @@ public class StyleMaker {
         board = new ChessPiece[size][size];
         
         //setting up chess pieces for usage
-        //PATHS ARE IMPORTANT THEY ARE WRONG HERE THEY NEEED TO EXIST
-        String styleDirectory = ".\\ChessJframesApp\\src\\main\\java\\cz\\cvut\\fel\\skardada\\chess\\ChessStyles\\";
-        String pieceDirectory = ".\\ChessJframesApp\\src\\main\\java\\cz\\cvut\\fel\\skardada\\chess\\ChessPieces\\";
+        String pieceDirectory = StyleMaker.class.getResource("/").toString().substring(6);
         String piecePrefix = "piece_";
         String pieceSuffix = ".ser";
         String[] availablePieces = null;
         
+        //get all available piece files
         File[] availablePieceFiles = null;
         try{
             File piecesDir = new File(pieceDirectory);
             availablePieceFiles = piecesDir.listFiles(new FilenameFilter(){
                 @Override
                 public boolean accept(File dir, String name)
-                    {
-                       return name.startsWith(piecePrefix) && name.endsWith(pieceSuffix);
-                    }
+                {
+                   return name.startsWith(piecePrefix) && name.endsWith(pieceSuffix);
+                }
             }); 
         }
         catch(IOError ex){
@@ -185,6 +183,8 @@ public class StyleMaker {
                 }
             }
         }
+        
+        //create style 
         try{
             style = new ChessStyle(size, board, name);
         }
@@ -192,8 +192,13 @@ public class StyleMaker {
             System.err.println("Could not create chess style " + ex.getMessage());
             System.exit(-1);
         }
+        
+        //path where to save serialized style - if this doesnt work (cant find system Path) - substitute this for your own absolute path
+        String styleDirectory = "D:\\Projects\\Java\\Semestralka_PJV\\ChessJframesApp\\src\\main\\resources\\";
+        
+        //serialize
         try{
-            FileOutputStream styleSer = new FileOutputStream(styleDirectory + "style_" +name +  ".ser");
+            FileOutputStream styleSer = new FileOutputStream(styleDirectory + "style_" + name +  ".ser");
             ObjectOutputStream out = new ObjectOutputStream(styleSer);
             out.writeObject(style);
             out.close();

@@ -48,8 +48,7 @@ public class FutureStatesGenTest extends TestCase {
         board[0][0] = p;
         Mockito.when(mockBoard.getBoard()).thenReturn(board);
         Mockito.when(mockBoard.getSize()).thenReturn(4);
-        gen.calculateAvailableMoves(mockBoard);
-        System.out.println(p.getAvailableMoves().toString());
+        System.out.println(gen.calculateAvailableMoves(mockBoard, p).toArray().toString());
     }
     
 }

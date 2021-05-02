@@ -29,7 +29,6 @@ public class MainView extends javax.swing.JFrame {
      */
     public MainView() {
         //temp
-        stylePath= ".\\src\\main\\java\\cz\\cvut\\fel\\skardada\\chess\\ChessStyles\\style_chibi.ser";
         initComponents();
     }
 
@@ -42,27 +41,28 @@ public class MainView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        p1TimeButtonGroup = new javax.swing.ButtonGroup();
-        p2TimeButtonGroup = new javax.swing.ButtonGroup();
         playerColor = new javax.swing.ButtonGroup();
         p1TypeChooser = new javax.swing.JComboBox<>();
         p1NameChooser = new javax.swing.JTextField();
         p2NameChooser = new javax.swing.JTextField();
         p2TypeChooser = new javax.swing.JComboBox<>();
         startButton = new javax.swing.JButton();
-        p1TimeRadioButtonSame = new javax.swing.JRadioButton();
-        p1TimeRadioButtonDifferent = new javax.swing.JRadioButton();
-        p2TimeRadioButtonSame = new javax.swing.JRadioButton();
-        p2TimeRadioButtonDifferent = new javax.swing.JRadioButton();
         p1TimeChooser = new javax.swing.JTextField();
         p2TimeChooser = new javax.swing.JTextField();
         p2IncrementChooser = new javax.swing.JTextField();
         p1IncrementChooser = new javax.swing.JTextField();
         p1Color = new javax.swing.JRadioButton();
         p2Color = new javax.swing.JRadioButton();
-        mainMenuBar = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
+        player2TimeLabel = new javax.swing.JLabel();
+        player1TimeLabel = new javax.swing.JLabel();
+        player1Increment = new javax.swing.JLabel();
+        player2Increment = new javax.swing.JLabel();
+        player2NameLabel = new javax.swing.JLabel();
+        player1NameLabel = new javax.swing.JLabel();
+        loadGameButton = new javax.swing.JButton();
+        setUpGameButton = new javax.swing.JButton();
+        viewPgnButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -86,29 +86,14 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
+        startButton.setBackground(new java.awt.Color(0, 204, 51));
+        startButton.setFont(new java.awt.Font("Arial Black", 1, 48)); // NOI18N
         startButton.setText("Start");
         startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 startButtonActionPerformed(evt);
             }
         });
-
-        p1TimeButtonGroup.add(p1TimeRadioButtonSame);
-        p1TimeRadioButtonSame.setSelected(true);
-        p1TimeRadioButtonSame.setText("Same time as opponent");
-
-        p1TimeButtonGroup.add(p1TimeRadioButtonDifferent);
-        p1TimeRadioButtonDifferent.setText("Different time than opponent");
-
-        p2TimeButtonGroup.add(p2TimeRadioButtonSame);
-        p2TimeRadioButtonSame.setSelected(true);
-        p2TimeRadioButtonSame.setText("Same time as opponent");
-        p2TimeRadioButtonSame.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        p2TimeRadioButtonSame.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-
-        p2TimeButtonGroup.add(p2TimeRadioButtonDifferent);
-        p2TimeRadioButtonDifferent.setText("Different time than opponent");
-        p2TimeRadioButtonDifferent.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
         p1TimeChooser.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         p1TimeChooser.setText("00:10:00");
@@ -136,81 +121,136 @@ public class MainView extends javax.swing.JFrame {
         p2Color.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         p2Color.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        jMenu1.setText("File");
-        mainMenuBar.add(jMenu1);
+        player2TimeLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        player2TimeLabel.setText("Player 2 Time");
 
-        jMenu2.setText("Edit");
-        mainMenuBar.add(jMenu2);
+        player1TimeLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        player1TimeLabel.setText("Player 1 Time");
 
-        setJMenuBar(mainMenuBar);
+        player1Increment.setText("Player 1 Increment");
+
+        player2Increment.setText("Player 2 Increment");
+
+        player2NameLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        player2NameLabel.setText("Player 2 Name");
+        player2NameLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+
+        player1NameLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        player1NameLabel.setText("Player 1 Name");
+
+        loadGameButton.setText("Load Saved Game");
+
+        setUpGameButton.setText("Set Up Pieces");
+        setUpGameButton.setToolTipText("");
+
+        viewPgnButton.setText("View PGN Game");
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
+        jLabel1.setText("Super Duper Chess");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(150, 150, 150)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(p1TimeRadioButtonDifferent, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(p1TimeRadioButtonSame, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(p1TimeChooser, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(p1TypeChooser, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(p1NameChooser, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(p1IncrementChooser, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(p1Color, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 316, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(p2TimeRadioButtonSame, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(p2NameChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(p2TypeChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(p2TimeRadioButtonDifferent, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(p2TimeChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(p2IncrementChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(p2Color, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(loadGameButton, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(setUpGameButton, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(56, 56, 56)
+                        .addComponent(viewPgnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(player1TimeLabel)
+                            .addComponent(player1Increment)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(p1TypeChooser, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(p1NameChooser, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(p1IncrementChooser, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(p1Color, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(p1TimeChooser, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(player1NameLabel))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(383, 383, 383)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(player2Increment, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(p2TimeChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(p2IncrementChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(92, 92, 92)
+                                .addComponent(startButton, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(p2Color, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                            .addComponent(player2TimeLabel)
+                                            .addGap(9, 9, 9))
+                                        .addComponent(p2TypeChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(player2NameLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(p2NameChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                 .addGap(150, 150, 150))
             .addGroup(layout.createSequentialGroup()
-                .addGap(400, 400, 400)
-                .addComponent(startButton, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(267, 267, 267)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 479, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(80, 80, 80)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE, false)
+                        .addComponent(setUpGameButton, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(viewPgnButton, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(loadGameButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(p1NameChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(p2NameChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                    .addComponent(player1NameLabel)
+                    .addComponent(player2NameLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(p2NameChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(p1NameChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(p1TypeChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(p2TypeChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(p2Color)
+                    .addComponent(p1Color))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(p1Color)
-                    .addComponent(p2Color))
-                .addGap(34, 34, 34)
+                    .addComponent(player1TimeLabel)
+                    .addComponent(player2TimeLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(p2TimeRadioButtonSame)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(p2TimeRadioButtonDifferent)
-                        .addGap(18, 18, 18)
                         .addComponent(p2TimeChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(68, 68, 68)
-                        .addComponent(p2IncrementChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(64, 64, 64)
-                        .addComponent(startButton, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(3, 3, 3))
+                    .addComponent(p1TimeChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(25, 25, 25)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(p1IncrementChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(p2IncrementChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(player1Increment, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(player2Increment, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(149, 149, 149))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(p1TimeRadioButtonSame)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(p1TimeRadioButtonDifferent)
-                        .addGap(18, 18, 18)
-                        .addComponent(p1TimeChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(68, 68, 68)
-                        .addComponent(p1IncrementChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(60, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
+                        .addComponent(startButton, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(35, 35, 35))))
         );
 
         pack();
@@ -262,15 +302,6 @@ public class MainView extends javax.swing.JFrame {
         else{
             p1color = PlayerColors.black;
             p2color = PlayerColors.white;
-        }
-        
-        //set Player Time
-        
-        if(p1TimeRadioButtonSame.isSelected()){
-            p1TimeChooser.setText(p2TimeChooser.getText());
-        }
-        if(p2TimeRadioButtonSame.isSelected()){
-            p2TimeChooser.setText(p1TimeChooser.getText());
         }
         
         // Player 1
@@ -370,6 +401,7 @@ public class MainView extends javax.swing.JFrame {
         if (noErrors) {
            this.ready = true; 
         }
+        
         else{
             this.ready = false;
         }
@@ -440,26 +472,27 @@ public class MainView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenuBar mainMenuBar;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton loadGameButton;
     private javax.swing.JRadioButton p1Color;
     private javax.swing.JTextField p1IncrementChooser;
     private javax.swing.JTextField p1NameChooser;
-    private javax.swing.ButtonGroup p1TimeButtonGroup;
     private javax.swing.JTextField p1TimeChooser;
-    private javax.swing.JRadioButton p1TimeRadioButtonDifferent;
-    private javax.swing.JRadioButton p1TimeRadioButtonSame;
     private javax.swing.JComboBox<PossibleOpponents> p1TypeChooser;
     private javax.swing.JRadioButton p2Color;
     private javax.swing.JTextField p2IncrementChooser;
     private javax.swing.JTextField p2NameChooser;
-    private javax.swing.ButtonGroup p2TimeButtonGroup;
     private javax.swing.JTextField p2TimeChooser;
-    private javax.swing.JRadioButton p2TimeRadioButtonDifferent;
-    private javax.swing.JRadioButton p2TimeRadioButtonSame;
     private javax.swing.JComboBox<PossibleOpponents> p2TypeChooser;
+    private javax.swing.JLabel player1Increment;
+    private javax.swing.JLabel player1NameLabel;
+    private javax.swing.JLabel player1TimeLabel;
+    private javax.swing.JLabel player2Increment;
+    private javax.swing.JLabel player2NameLabel;
+    private javax.swing.JLabel player2TimeLabel;
     private javax.swing.ButtonGroup playerColor;
+    private javax.swing.JButton setUpGameButton;
     private javax.swing.JButton startButton;
+    private javax.swing.JButton viewPgnButton;
     // End of variables declaration//GEN-END:variables
 }

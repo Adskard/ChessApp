@@ -23,7 +23,12 @@ public class Game {
         this.players = players;
     }
     
-    
+    public Game(Board board, ArrayList<Player> players){
+        this.style = null;
+        this.gameBoard = board;
+        this.gameBoard.updatePieces();
+        this.players = players;
+    }
 
     public Board getGameBoard() {
         return gameBoard;

@@ -74,10 +74,13 @@ public class ChessController implements Runnable{
     }
     
     private void setUpTheGame(){
-        ChessStyle style = this.loadGameStyle(mainView.getStylePath());    
+        //change this to change chessStyle
+        String stylePath = ChessController.class.getResource("/style_standard.ser").toExternalForm().substring(6);
+        ChessStyle style = this.loadGameStyle(stylePath);  
+        
         ArrayList<Player> players = new ArrayList<>();
         
-        
+        //TODO - change initialization for n - players
         
         //initialize clocks for players
         ChessClock p1Clock = new ChessClock(this.mainView.getP1time(),this.mainView.getP1incrementTime());
@@ -90,22 +93,22 @@ public class ChessController implements Runnable{
             case internet :
                 //TODO internet opponents
             case computer:
-                p2 = new Player_Computer(this.mainView.getP2name(), this.mainView.getP2color(), getPlayerPieces(PlayerColors.black, style), p2Clock);
+                p2 = new Player_Computer(this.mainView.getP2name(), this.mainView.getP2color(), getPlayerPieces(this.mainView.getP2color(), style), p2Clock);
                 break;
             case local:
             default:
-                p2 = new Player_Human(this.mainView.getP2name(), this.mainView.getP2color(), getPlayerPieces(PlayerColors.black, style), p2Clock);
+                p2 = new Player_Human(this.mainView.getP2name(), this.mainView.getP2color(), getPlayerPieces(this.mainView.getP2color(), style), p2Clock);
                 break;    
         }
         switch(this.mainView.getP1Type()){
             case internet :
                 //TODO internet opponents
             case computer:
-                p1 = new Player_Computer(this.mainView.getP1name(), this.mainView.getP1color(), getPlayerPieces(PlayerColors.white, style), p1Clock);
+                p1 = new Player_Computer(this.mainView.getP1name(), this.mainView.getP1color(), getPlayerPieces(this.mainView.getP1color(), style), p1Clock);
                 break;
             case local:
             default:
-                p1 = new Player_Human(this.mainView.getP1name(), this.mainView.getP1color(), getPlayerPieces(PlayerColors.white, style), p1Clock);
+                p1 = new Player_Human(this.mainView.getP1name(), this.mainView.getP1color(), getPlayerPieces(this.mainView.getP1color(), style), p1Clock);
                 break;    
         }
         
@@ -120,6 +123,8 @@ public class ChessController implements Runnable{
         Player winner = null;
         ArrayList<Player> players = this.game.getPlayers();
         int currentPlayerIndex = 0;
+        boolean noMovesDraw = false;
+        boolean insufficientMatDraw;
         
         //get starting player - white starts
         for(int i = 0; i< players.size(); i++){
@@ -132,6 +137,7 @@ public class ChessController implements Runnable{
         while(winner == null){
             
             Player currentPlayer = players.get(currentPlayerIndex);
+            insufficientMatDraw = true;
             //diagnostic fucntions
             printBoard();
             System.out.println("Current player: " + currentPlayer.getColor().toString());
@@ -140,51 +146,61 @@ public class ChessController implements Runnable{
             ArrayList<Player> playersToRemove = new ArrayList();
             for(Player p : players){
                 p.updateAvailableMoves();
-                System.out.println(p.getColor() + " " + p.getAvailableMoves() + " " + p.getOwnPieces());
+                
+                //player is mated
                 if(p.isMated()){
                     System.out.println(p.getColor() + " mated");
                     playersToRemove.add(p);
                 }
+                
+                
                 else{
+                    
+                    //no available moves DRAW
                     if(p.getAvailableMoves().isEmpty()){
-                        System.out.println("DRAW");
-                        return; 
+                        noMovesDraw = true;
+                    }
+                    
+                    //insuficient material DRAW
+                    if(!p.hasInsufficientMaterial()){
+                        insufficientMatDraw = false;
                     }
                 }
             }
             players.removeAll(playersToRemove);
+            
+            //last player standing wins
             if(players.size() == 1){
                 winner = players.get(0);
-                System.out.println("WINNER IS PLAYER "+ players.get(0).getColor());
+                System.out.println("WINNER IS PLAYER "+ winner.getColor());
                 return;
             } 
-            //TODO - add draw options
-                
-            //threefold repetiotion
             
-            //no available moves 
-            
-            else{
-                synchronized(this){
-                    boardView.setCurrentPlayer(currentPlayer);
-                    currentPlayer.getChessClock().clockStart();
-                    currentPlayer.setFinishedTurn(false);
-                    currentPlayer.makeMove(game.getGameBoard());
-                    while(!currentPlayer.getFinishedTurn()){
-                        this.boardView.updateClocks();
-                        try{
-                           this.wait(10); 
-                            System.out.println("waiting for move input");
-                        }
-                        catch(Exception e){
-                            System.err.println(e.getMessage() + " " + Thread.currentThread().getName());
-                        }
-                    } 
-                    currentPlayer.getChessClock().clockStop();
-                }
+            // DRAW - THREE fold repetition isnt automatic, but agreed uppon by players - its not part of this project
+            if(noMovesDraw || insufficientMatDraw){
+                System.out.println("DRAW");
+                return;
             }
-            this.boardView.repaintFromModel();
+            
+            //take a turn
+            synchronized(this){
+                boardView.setCurrentPlayer(currentPlayer);
+                currentPlayer.getChessClock().clockStart();
+                currentPlayer.setFinishedTurn(false);
+                currentPlayer.makeMove(game.getGameBoard());
+                while(!currentPlayer.getFinishedTurn()){
+                    this.boardView.updateClocks();
+                    try{
+                       this.wait(10); 
+                    }
+                    catch(Exception e){
+                        System.err.println(e.getMessage() + " " + Thread.currentThread().getName());
+                    }
+                } 
+                currentPlayer.getChessClock().clockStop();
+            }
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+            this.boardView.repaintFromModel();
         }
     } 
     
@@ -222,7 +238,6 @@ public class ChessController implements Runnable{
 
     private ChessStyle loadGameStyle(String stylePath){
         //Get better pathing TODO
-        stylePath = "D:\\Projects\\Java\\ChessJframesApp\\ChessJframesApp\\src\\main\\java\\cz\\cvut\\fel\\skardada\\chess\\ChessStyles\\style_standard.ser";
         ChessStyle style = null;
         try{
             FileInputStream file = new FileInputStream(stylePath);
@@ -240,5 +255,29 @@ public class ChessController implements Runnable{
             return null;
         }
         return style;
+    }
+    
+    private void manualSetUp(){
+        //TODO
+    }
+    
+    private void importPgnGame(){
+        //TODO
+    }
+    
+    private void exportPgnGame(){
+        //TODO
+    }
+    
+    private void saveGame(){
+        //TODO
+    }
+    
+    private void loadGame(){
+        //TODO
+    }
+    
+    private void announceWinner(){
+        //TODO
     }
 }

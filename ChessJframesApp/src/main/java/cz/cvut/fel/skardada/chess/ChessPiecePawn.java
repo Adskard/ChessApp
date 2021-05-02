@@ -15,11 +15,11 @@ public class ChessPiecePawn extends ChessPiece{
     
     private boolean canBePromoted;
 
-    public ChessPiecePawn(Coordinates pos, PlayerColors color)  throws Exception {
+    public ChessPiecePawn(Coordinates pos, PlayerColors color) {
         super(color + "Pawn",pos, color, new MoveSet((color==PlayerColors.white ?
             new Coordinates[]{new Coordinates(1,0)} :
             new Coordinates[]{new Coordinates(-1,0)}), 1),
-        "D:\\Projects\\Java\\ChessJframesApp\\ChessJframesApp\\src\\main\\java\\resources\\"+color.toString()+"Pawn.png"
+        "/"+color.toString()+"Pawn.png"
         );
         canBePromoted = false;
     }   

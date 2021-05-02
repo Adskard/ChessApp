@@ -56,6 +56,8 @@ public class Player_Computer extends Player{
                 this.getOwnPieces().add(promoted);
             }
         }
+        
+        //indicate end of turn to the controller
         this.setFinishedTurn(true);
     }
     

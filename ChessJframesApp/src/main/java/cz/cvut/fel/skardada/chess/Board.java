@@ -21,7 +21,7 @@ public class Board {
         this.size = size;
         this.board = arrangement;
         this.history = new TurnHistory();
-        this.uniquePieces = findUniques(this);
+        this.uniquePieces = this.findUniques(this);
         this.distributeIds();
     }
     
@@ -232,9 +232,6 @@ public class Board {
     }
     
     public ChessPiece promotion(ChessPiece promoted, ChessPiece newRank){
-        if(promoted.getColor() != newRank.getColor()){
-            return null;
-        }
         Coordinates coords = promoted.getPosition();
         int id = promoted.getId();
         ChessPiece promotedPiece = new ChessPieceImpl(newRank);
@@ -251,18 +248,21 @@ public class Board {
     }
     
     private ArrayList<ChessPiece> findUniques(Board board){
-        ArrayList<ChessPiece> unique = new ArrayList<ChessPiece>();
+        ArrayList<ChessPiece> unique = new ArrayList<>();
         for(ChessPiece[] row : board.getBoard()){
             for(ChessPiece piece : row){
                 if (piece == null) {
                     continue;
                 }
+                
+                //search prior occurences
                 boolean contains = true;
                 for(ChessPiece uniquePiece : unique){
                     if(piece.getName().equals(uniquePiece.getName())){
                         contains = false;
                     }
                 }
+                //dont want kings or pawns
                 if(contains && piece instanceof ChessPieceImpl){
                     unique.add(piece);
                 }

@@ -39,7 +39,20 @@ public abstract class Player {
         return false;
     }
     
+    public boolean hasInsufficientMaterial(){
+        //only king remains 
+        if (this.ownPieces.size() == 1) {
+            return true;
+        }
+        //king and bishop or knight remains
+        if(this.ownPieces.size() == 2 && (this.ownPieces.get(0).getName().contains("Knight") || this.ownPieces.get(0).getName().contains("Bishop") || this.ownPieces.get(1).getName().contains("Knight") || this.ownPieces.get(1).getName().contains("Bishop"))){
+            return true;
+        }
+        return false;
+    }
+    
     public void updateAvailableMoves(){
+        //go through all owned pieces, removed destoryed pieces and get legal moves of still alive pieces
         this.availableMoves.clear();
         ArrayList<ChessPiece> removedPieces = new ArrayList();
         for(ChessPiece piece : this.ownPieces){
@@ -50,16 +63,6 @@ public abstract class Player {
             this.availableMoves.addAll(piece.getLegalMoves());
         }
         this.ownPieces.removeAll(removedPieces);
-    }
-    
-    public ArrayList<ChessPiece> getKnockedOutPieces(){
-        ArrayList<ChessPiece> knockedOutPieces = new ArrayList<>();
-        for(ChessPiece piece : this.ownPieces){
-            if(piece.getPosition().getX() == -1){
-                knockedOutPieces.add(piece);
-            }
-        }
-        return knockedOutPieces;
     }
     
     public boolean isChecked(){ 

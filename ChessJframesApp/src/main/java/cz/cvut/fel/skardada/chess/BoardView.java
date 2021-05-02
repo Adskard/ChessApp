@@ -11,6 +11,8 @@ import java.awt.image.*;
 import javax.imageio.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author Adam Škarda
@@ -45,7 +47,36 @@ public class BoardView{
     private void moveChessPiece(Coordinates source, Coordinates dest){
         //model changes
         this.modelBoard.movePiece(source, dest);
+        
+        //Check if promotion is needed/available
+        ChessPiece piece = modelBoard.getChessPieceAtCoordinate(dest);
+        if(piece instanceof ChessPiecePawn){
+            ChessPiecePawn pawn = (ChessPiecePawn) piece;
+            if(pawn.isCanBePromoted()){
+                ChessPiece newRank = promotionPopUp();
+                ChessPiece promoted = modelBoard.promotion(pawn, newRank);
+                currentPlayer.getOwnPieces().remove(pawn);
+                currentPlayer.getOwnPieces().add(promoted);
+            }
+        }
         this.currentPlayer.setFinishedTurn(true);
+
+    }
+    
+    private ChessPiece promotionPopUp(){
+        //get options for promotions
+        ArrayList<ChessPiece> options = new ArrayList();
+        for(ChessPiece piece : modelBoard.getUniquePieces()){
+            if(piece.getColor().equals(currentPlayer.getColor())){
+                options.add(piece);
+            }
+        }
+        Object[] possibilities = options.toArray();
+        
+        //create popUp
+        ChessPiece answer = (ChessPiece)JOptionPane.showInputDialog(frame,"Quick!" + System.lineSeparator() + "Choose piece to promote to!","Promotion",
+            JOptionPane.PLAIN_MESSAGE,null,possibilities,possibilities[0]);
+        return answer;
     }
     
     private class userMoveInputHandler implements ActionListener{
@@ -91,13 +122,10 @@ public class BoardView{
         }
     }
     
+    
     public void updateClocks(){
         P1Time.setText(modelGame.getPlayers().get(0).getChessClock().getRemainingSeconds());
         P2Time.setText(modelGame.getPlayers().get(1).getChessClock().getRemainingSeconds());
-    }
-    
-    private void updateLostPieces(){
-        
     }
     
     private void updateHistory(){
@@ -106,16 +134,17 @@ public class BoardView{
     
     public void repaintFromModel(){
         
-        updateClocks(); // migrate to per second thread 
         updateHistory();
         
+        //synchronizes squares from model and squares from view view
         for (int i = 0; i < boardSquares.length; i++) {  
             for (int j = 0; j < boardSquares[i].length; j++) {
                 JButton square = this.boardSquares[i][j];
                 if(modelBoard.getBoard()[i][j] != null){
                     String imagePath = modelBoard.getBoard()[i][j].getImagePath();
+                    String fullImagePath = BoardView.class.getResource(imagePath).toExternalForm().substring(6) ;
                     try{
-                      BufferedImage image = ImageIO.read(new File(imagePath));  
+                      BufferedImage image = ImageIO.read(new File(fullImagePath));  
                       square.setIcon(new ImageIcon(image));
                     }
                     catch(Exception e){
@@ -129,9 +158,6 @@ public class BoardView{
         }
     }
     
-    private void flipTheBoard(){
-
-    }
     
     private void updateAvailableMovesView(){
         //repaint squares bach to original
@@ -151,30 +177,34 @@ public class BoardView{
         }
     }
     
+    
     private void initComponents(){
         //create main frame
         frame = new JFrame();
         frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(550,550);
-        frame.setLayout(new GridLayout(0,2));
-        
-        //components of main frame
-        JPanel optionsAndHistory = new JPanel(new GridBagLayout());
-        JPanel boardFrame = new JPanel(new GridLayout(3, 0));
+        frame.setSize(800,800);
+        frame.setLayout(new BorderLayout(40, 20));
         
         //components of options and history part - left side
         
-        JPanel optionsPanel = new JPanel();
+        JPanel optionsPanel = new JPanel(new BorderLayout(30, 60));
+        
+        JButton saveButton = new JButton("Save");
+        optionsPanel.add(saveButton, BorderLayout.PAGE_START);
         
         history = new JList(modelGame.getGameBoard().getHistory().getDestinations().toArray());
+        history.setLayoutOrientation(JList.VERTICAL);
+        history.setVisibleRowCount(10);
+        history.setSize(200, 500);
+        history.setFixedCellHeight(20);
+        history.setFixedCellWidth(100);
+        optionsPanel.add(new JScrollPane(history), BorderLayout.CENTER);
         
-        optionsAndHistory.add(optionsPanel);
-        optionsAndHistory.add(history);
         
         //components of board part - right side
         
-        p1 = new JPanel(); // panel with player name, time, pieces lost
-        p2 = new JPanel(); // panel with player name, time, pieces lost
+        p1 = new JPanel(new FlowLayout(0, 100, 20)); // panel with player name, time, pieces lost
+        p2 = new JPanel(new FlowLayout(0, 100, 20)); // panel with player name, time, pieces lost
         
         JLabel p1Name = new JLabel(modelGame.getPlayers().get(0).getName());
         JLabel p2Name = new JLabel(modelGame.getPlayers().get(1).getName());
@@ -186,17 +216,30 @@ public class BoardView{
         p1.add(P1Time);
         p2.add(P2Time);
         
-        JLabel p1Pieces = new JLabel("Pieces");
-        JLabel p2Pieces = new JLabel("Pieces");
-        p1.add(p1Pieces);
-        p2.add(p2Pieces);
+        JButton p1Forfeit = new JButton("Forfeit");
+        JButton p2Forfeit = new JButton("Forfeit");
+        p1.add(p1Forfeit);
+        p2.add(p2Forfeit);
         
+
+        initBoardSquares();
+        frame.add(p1, BorderLayout.PAGE_START);
+        frame.add(chessBoard, BorderLayout.CENTER);
+        frame.add(p2, BorderLayout.PAGE_END);
+        frame.add(optionsPanel, BorderLayout.LINE_END);
+        frame.setVisible(true);
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+    
+    private void initBoardSquares(){
         chessBoard = new JPanel(new GridLayout(0,modelBoard.getSize() + 1));
-        
-        boardFrame.add(p1);
-        boardFrame.add(chessBoard);
-        boardFrame.add(p2);
-              
         //alloting squares to chessBoard, where board squares are JButtons and coordinates are lables      
         for (int i = 0; i < boardSquares.length; i++) { 
             //add coordinates to first row of chess board
@@ -228,10 +271,10 @@ public class BoardView{
                 
                 //getting squre content
                 if(modelBoard.getBoard()[i][j] != null){
-                    
                     String imagePath = modelBoard.getBoard()[i][j].getImagePath();
+                    String fullImagePath = BoardView.class.getResource(imagePath).toExternalForm().substring(6) ;
                     try{
-                      BufferedImage image = ImageIO.read(new File(imagePath));  
+                      BufferedImage image = ImageIO.read(new File(fullImagePath));  
                       square.setIcon(new ImageIcon(image));
                     }
                     catch(Exception e){
@@ -252,19 +295,19 @@ public class BoardView{
                 chessBoard.add(square);
             }
         }
-        
-        //finalize computing and set visible
-        frame.add(optionsAndHistory);
-        frame.add(boardFrame);
-        frame.setVisible(true);
-    }
-
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }
-
-    public void setCurrentPlayer(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
     }
     
+    private void addComponentsToGridBag(Component addedComponent, Container container, GridBagLayout layout, GridBagConstraints gbc, int x, int y, int width, int heigth, int fill, int anchor){
+        gbc.gridx = x;
+        gbc.gridy = y;
+
+        gbc.gridwidth = width;
+        gbc.gridheight = heigth;
+        
+        gbc.fill = fill;
+        gbc.anchor = anchor;
+
+        layout.setConstraints(addedComponent, gbc);
+        container.add(addedComponent);
+    }
 }

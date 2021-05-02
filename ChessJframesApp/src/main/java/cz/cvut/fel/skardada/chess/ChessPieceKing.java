@@ -14,7 +14,7 @@ import java.io.File;
 public class ChessPieceKing extends ChessPiece {
     private boolean checked;
 
-    public ChessPieceKing(Coordinates pos, PlayerColors color)  throws Exception{
+    public ChessPieceKing(Coordinates pos, PlayerColors color){
         super(color + "King",pos, color, new MoveSet(new Coordinates[]{
             new Coordinates(1,1),
             new Coordinates(-1,-1),
@@ -26,7 +26,7 @@ public class ChessPieceKing extends ChessPiece {
             new Coordinates(-1,0)
         }, 1),
 
-            "D:\\Projects\\Java\\ChessJframesApp\\ChessJframesApp\\src\\main\\java\\resources\\"+color.toString()+"King.png"
+            "/"+color.toString()+"King.png"
                 );
         this.checked = false;
     }

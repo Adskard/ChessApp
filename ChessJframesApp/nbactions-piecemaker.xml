@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath cz.cvut.fel.skardada.chess.ChessPieces.ChessPieceMaker -n whiteKnight -v 2,1 2,-1 -2,-1 -2,1 1,2 1,-2 -1,2 -1,-2  -d 1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\whiteKnight.png"</exec.args>
+                <exec.args>-classpath %classpath cz.cvut.fel.skardada.chess.ChessPieces.ChessPieceMaker -n whiteKnight -v 2,1 2,-1 -2,-1 -2,1 1,2 1,-2 -1,2 -1,-2  -d 1 -i "/whiteKnight.png"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath cz.cvut.fel.skardada.chess.ChessPieces.ChessPieceMaker -n whiteKnight -v 2,1 2,-1 -2,-1 -2,1 1,2 1,-2 -1,2 -1,-2  -d 1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\whiteKnight.png"</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath cz.cvut.fel.skardada.chess.ChessPieces.ChessPieceMaker -n whiteKnight -v 2,1 2,-1 -2,-1 -2,1 1,2 1,-2 -1,2 -1,-2  -d 1 -i "/whiteKnight.png"</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath cz.cvut.fel.skardada.chess.ChessPieces.ChessPieceMaker -n whiteKnight -v 2,1 2,-1 -2,-1 -2,1 1,2 1,-2 -1,2 -1,-2  -d 1 -i "D:\Projects\Java\ChessJframesApp\ChessJframesApp\src\main\java\resources\whiteKnight.png"</exec.args>
+                <exec.args>-classpath %classpath cz.cvut.fel.skardada.chess.ChessPieces.ChessPieceMaker -n whiteKnight -v 2,1 2,-1 -2,-1 -2,1 1,2 1,-2 -1,2 -1,-2  -d 1 -i "/whiteKnight.png"</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
