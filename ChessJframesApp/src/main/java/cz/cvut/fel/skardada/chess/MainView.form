@@ -317,17 +317,26 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Load Saved Game"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadGameButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="setUpGameButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Set Up Pieces"/>
         <Property name="toolTipText" type="java.lang.String" value=""/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="setUpGameButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="viewPgnButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="View PGN Game"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="viewPgnButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>

@@ -20,6 +20,11 @@ public class ChessClock implements Runnable{
         this.increment = this.convertStringToLong(increment);
     }
     
+    public ChessClock(long clock, long increment){
+        this.timer = clock;
+        this.increment = increment;
+    }
+    
     public void clockStart(){
         this.timeFlows = true;
         if(clockThread == null){
@@ -83,6 +88,10 @@ public class ChessClock implements Runnable{
             output += Long.parseLong(timeParts[i]) * 1000 * Math.pow(60, timeParts.length - 1 - i);
         }
         return output;
+    }
+
+    public long getIncrement() {
+        return increment;
     }
 }
 

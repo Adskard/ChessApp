@@ -58,35 +58,45 @@ public class ChessController implements Runnable{
             
             //for the next game
             mainView.setReady(false);
-
-            //Set up the game model
-            this.setUpTheGame();
-
-            //Options nolonger visible, but not terminated - can be used after game ends
-            mainView.setVisible(false);
-
-            //Initialize game board view
-            this.boardView = new BoardView(this.game);
-
-            //wait for the board to initialize
-            synchronized(this){
-                while(!boardView.ready){
-                    try{
-                      this.wait(10);  
-                    }
-                    catch(Exception E){
-                        System.err.println(E.getMessage());
-                    }
-                }
+            
+            if(mainView.isNormalStart()){
+                this.normalStart();
+            }
+            if (mainView.isLoadGame()) {
+                
             }
 
-            //Start the chess game
-            this.startTheGame();  
         }
         
     }
     
-    private void setUpTheGame(){
+    private void normalStart(){
+        //Set up the game model
+        this.normalGameSetup();
+
+        //Options nolonger visible, but not terminated - can be used after game ends
+        mainView.setVisible(false);
+
+        //Initialize game board view
+        this.boardView = new BoardView(this.game);
+
+        //wait for the board to initialize
+        synchronized(this){
+            while(!boardView.ready){
+                try{
+                  this.wait(10);  
+                }
+                catch(Exception E){
+                    System.err.println(E.getMessage());
+                }
+            }
+        }
+
+        //Start the chess game
+        this.startTheGame(); 
+    }
+    
+    private void normalGameSetup(){
         String stylePath = "";
         //change this to change chessStyle
         try {
@@ -295,7 +305,8 @@ public class ChessController implements Runnable{
     }
     
     private void exportPgnGame(PlayerColors winner){
-        System.out.println(PgnParser.encodeGameToPgn(this.game, winner));
+        String path = boardView.showSaveDialog();
+        PgnParser.exportPgnGameToFile(path, game, winner);
     }
     
     private void saveGame(){

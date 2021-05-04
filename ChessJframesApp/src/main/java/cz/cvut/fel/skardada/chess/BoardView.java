@@ -10,6 +10,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 import javax.imageio.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -35,12 +36,14 @@ public class BoardView{
     private Coordinates chosenSquareCoords = null;
     private boolean redraw = false;
     public boolean ready = false;
+    private JFileChooser saveDialog;
     
     public BoardView(Game game) {
         this.modelGame = game;
         this.modelBoard = game.getGameBoard();
         this.boardSquares = new JButton[modelBoard.getSize()][modelBoard.getSize()];
         availableSquares = new ArrayList<JButton>();
+        this.saveDialog = new JFileChooser();
         initComponents();
         this.ready = true;
     }
@@ -196,6 +199,15 @@ public class BoardView{
         JPanel optionsPanel = new JPanel(new BorderLayout(30, 60));
         
         JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String path = showSaveDialog();
+
+                PgnParser.savePgnGameToFile(path, modelGame);
+
+            }
+        });
         optionsPanel.add(saveButton, BorderLayout.PAGE_START);
         
         history = new JList(modelGame.getGameBoard().getHistory().getMovesInPgn().toArray());
@@ -221,12 +233,6 @@ public class BoardView{
         P2Time = new JLabel(modelGame.getPlayers().get(1).getChessClock().getRemainingSeconds());
         p1.add(P1Time);
         p2.add(P2Time);
-        
-        JButton p1Forfeit = new JButton("Forfeit");
-        JButton p2Forfeit = new JButton("Forfeit");
-        p1.add(p1Forfeit);
-        p2.add(p2Forfeit);
-        
 
         initBoardSquares();
         frame.add(p1, BorderLayout.PAGE_START);
@@ -331,6 +337,15 @@ public class BoardView{
             this.frame.dispose();
         }
         return false;
+    }
+    
+    public String showSaveDialog(){
+        int k = saveDialog.showSaveDialog(frame);
+        if (k != JFileChooser.APPROVE_OPTION) {
+            return "";
+        }
+        String path = saveDialog.getSelectedFile().getAbsolutePath();
+        return path;
     }
 
 }

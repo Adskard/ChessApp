@@ -24,7 +24,10 @@ public class MainView extends javax.swing.JFrame {
     private String p1name;
     private String p2name;
     private boolean ready = false;
-    private boolean start = false;
+    private boolean normalStart = false;
+    private boolean manualSetup = false;
+    private boolean pgnView = false;
+    private boolean loadGame = false;
     /**
      * Creates new form mainView
      */
@@ -141,11 +144,26 @@ public class MainView extends javax.swing.JFrame {
         player1NameLabel.setText("Player 1 Name");
 
         loadGameButton.setText("Load Saved Game");
+        loadGameButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadGameButtonActionPerformed(evt);
+            }
+        });
 
         setUpGameButton.setText("Set Up Pieces");
         setUpGameButton.setToolTipText("");
+        setUpGameButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setUpGameButtonActionPerformed(evt);
+            }
+        });
 
         viewPgnButton.setText("View PGN Game");
+        viewPgnButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewPgnButtonActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
         jLabel1.setText("Super Duper Chess");
@@ -260,9 +278,6 @@ public class MainView extends javax.swing.JFrame {
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         boolean noErrors = true;
-        //TODO set game style path
-        
-        //TODO set game save path
 
         //TODO sort THIS code to validate functions of elements
         
@@ -402,6 +417,7 @@ public class MainView extends javax.swing.JFrame {
         //set ready flag for controller
         if (noErrors) {
            this.ready = true; 
+           this.normalStart = true;
         }
         
         else{
@@ -421,6 +437,18 @@ public class MainView extends javax.swing.JFrame {
 
     }//GEN-LAST:event_p1TimeChooserPropertyChange
 
+    private void setUpGameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setUpGameButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_setUpGameButtonActionPerformed
+
+    private void loadGameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadGameButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_loadGameButtonActionPerformed
+
+    private void viewPgnButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewPgnButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_viewPgnButtonActionPerformed
+
     public String getSavePath() {
         return savePath;
     }
@@ -433,9 +461,22 @@ public class MainView extends javax.swing.JFrame {
         return p1time;
     }
 
-    public boolean isStart() {
-        return start;
+    public boolean isNormalStart() {
+        return normalStart;
     }
+
+    public boolean isManualSetup() {
+        return manualSetup;
+    }
+
+    public boolean isPgnView() {
+        return pgnView;
+    }
+
+    public boolean isLoadGame() {
+        return loadGame;
+    }
+
 
     public String getP2time() {
         return p2time;

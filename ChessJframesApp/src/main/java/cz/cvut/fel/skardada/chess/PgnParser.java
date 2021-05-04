@@ -10,6 +10,9 @@ package cz.cvut.fel.skardada.chess;
  * @author Adam Škarda
  */
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.*;
 public class PgnParser {
@@ -97,11 +100,7 @@ public class PgnParser {
         return pgnNotation;
     }
     
-    public static String encodeGameToPgn(Game game, PlayerColors winner){
-        if(!game.getStyle().getName().equals("standard")){
-            return null;
-        }
-        
+    public static String encodeGameToPgn(Game game, PlayerColors winner){   
         //tags
         String result = "1/2-1/2";
         if (winner == PlayerColors.black) {
@@ -129,6 +128,62 @@ public class PgnParser {
         }
         
         return notation;
+    }
+    
+    public static String saveGameInProgress(Game game){
+        String notation = "";
+        for (Player p : game.getPlayers()) {
+            notation +="[" + p.getName() + " \"" +  p.getClock().getRemainingTime() + "\" " +"\"" + p.getClock().getIncrement() +"\"]" +System.lineSeparator();
+        }
+        notation += "[Round \"" + game.getGameBoard().getHistory().getTurn() + "\"]" + System.lineSeparator();
+        for (Player p : game.getPlayers()) {
+            notation +="[" + p.getColor().toString().substring(0,1).toUpperCase() + p.getColor().toString().substring(1) + " \"" + p.getName() +  "\"]" + System.lineSeparator();
+        }
+        
+        //game
+        notation += System.lineSeparator();
+        ArrayList<String> gameNotation = game.getGameBoard().getHistory().getMovesInPgn();
+        for (int i = 0; i < gameNotation.size(); i++) {
+            if(i % 2 == 0){
+                notation += (i/2 + 1) + ". ";
+            }
+            notation += gameNotation.get(i);
+            notation += " ";
+        }
+        
+        return notation;
+    }
+    
+
+    
+    private static TurnHistory convertPgnToTurnHistory(String pgn){
+        TurnHistory history = new TurnHistory();
+        
+        return history;
+    }
+    
+    public static void savePgnGameToFile(String path, Game game){
+        try {
+            File output = new File(path);
+            output.createNewFile();
+            FileWriter writer = new FileWriter(output);
+            writer.write(saveGameInProgress(game));
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(PgnParser.class.getName()).log(Level.SEVERE, "Could not save this game to file: {0}", path);
+        }
+    }
+    
+    public static void exportPgnGameToFile(String path, Game game, PlayerColors winner){
+        try {
+            File output = new File(path);
+            output.createNewFile();
+            FileWriter writer = new FileWriter(output);
+            writer.write(encodeGameToPgn(game, winner));
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(PgnParser.class.getName()).log(Level.SEVERE, "Could not save this game to file: {0}", path);
+        }
     }
     
     public static String findPgnNotationForPiece(String pieceNameOrg){
