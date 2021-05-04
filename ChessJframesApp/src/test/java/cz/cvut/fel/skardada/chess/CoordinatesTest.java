@@ -5,8 +5,6 @@
  */
 package cz.cvut.fel.skardada.chess;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,10 +19,10 @@ public class CoordinatesTest {
      * Test of toString method, of class Coordinates.
      */
     @Test
-    public void testToString_x0y3_1d() {
+    public void testToString_Coordinates03_StringReslut1d() {
         //arrange
         Coordinates instance = new Coordinates(0,3);
-        String expResult = "4a";
+        String expResult = "1d";
         //act
         String result = instance.toString();
         //assert

@@ -5,8 +5,6 @@
  */
 package cz.cvut.fel.skardada.chess;
 
-import javax.imageio.*;
-import java.io.File;
 /**
  *
  * @author Adam Škarda

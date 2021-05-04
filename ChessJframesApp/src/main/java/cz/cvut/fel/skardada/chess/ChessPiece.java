@@ -56,10 +56,14 @@ public abstract class ChessPiece implements java.io.Serializable{
         return false;
         }
         ChessPiece p = (ChessPiece) o;
-        if(p.getId() == this.getId()){
-            return true;
-        }
-        return false;
+        return p.getId() == this.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + this.id;
+        return hash;
     }
 
     public void setId(int id) {

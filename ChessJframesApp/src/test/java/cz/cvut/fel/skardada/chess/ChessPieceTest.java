@@ -22,18 +22,29 @@ public class ChessPieceTest {
      */
     @Test
     public void testCanGetTo_King33to44_true() {
+        //arrange
         Coordinates pos = new Coordinates(4,4);
         ChessPiece instance = new ChessPieceKing(new Coordinates(3,3),PlayerColors.black);
         boolean expResult = true;
+        
+        //act
         boolean result = instance.canGetTo(pos);
+        
+        //assert
         assertEquals(expResult, result);
     }
+    
     @Test
     public void testCanGetTo_King33to55_false() {
+        //arrange
         Coordinates pos = new Coordinates(5,5);
         ChessPiece instance = new ChessPieceKing(new Coordinates(3,3),PlayerColors.black);
         boolean expResult = false;
+        
+        //act
         boolean result = instance.canGetTo(pos);
+        
+        //assert
         assertEquals(expResult, result);
     }
 }

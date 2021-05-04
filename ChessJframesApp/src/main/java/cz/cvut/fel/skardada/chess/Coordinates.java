@@ -63,6 +63,14 @@ public class Coordinates implements java.io.Serializable{
         }
         return false;
     }
+    
+    public String getRank(){
+        return Integer.toString(this.x+1);
+    }
+    
+    public String getFile(){
+        return Character.toString((char)(97 + this.y));
+    }
 
     /**
      *

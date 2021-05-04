@@ -6,12 +6,15 @@
 package cz.cvut.fel.skardada.chess;
 
 import java.util.ArrayList;
+import java.util.logging.*;
+
 
 /**
  *
  * @author Adam Škarda
  */
 public class FutureStatesGen {
+    private static Logger logger = Logger.getLogger(ChessController.class.getName());
  
     public static boolean isChecked(Board board, ChessPiece king){
         ChessPiece[][] pieces = board.getBoard();
@@ -30,6 +33,7 @@ public class FutureStatesGen {
                 //echeck if enemy pieces can get to king
                 else{ 
                     if(piece.canGetTo(king.getPosition())){
+                        logger.log(Level.FINER, "{0} is in check", king.getPosition());
                         return true;
                     }
                 }

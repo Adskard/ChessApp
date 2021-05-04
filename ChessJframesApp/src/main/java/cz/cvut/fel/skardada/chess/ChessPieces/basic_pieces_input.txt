@@ -8,5 +8,5 @@
 -n blackRook -v 0,-1 1,0 0,1 -1,0  -d -1 -i "/blackRook.png"
 
 standard style
--n standard  -s 8  -p wRook*1 wKnight*1 wBishop*1 wKing*1 wQueen*1 wBishop*1  wKnight*1 wRook*1 wPawn*8 -1*32 bPawn*8 bRook*1  bKnight*1  bBishop*1 bKing*1 bQueen*1  bBishop*1  bKnight*1  bRook*1
+-n standard  -s 8  -p wRook*1 wKnight*1 wBishop*1 wQueen*1 wKing*1  wBishop*1  wKnight*1 wRook*1 wPawn*8 -1*32 bPawn*8 bRook*1  bKnight*1  bBishop*1 bQueen*1 bKing*1 bBishop*1  bKnight*1  bRook*1
 -n standard  -s 8  -p wKing*1 wPawn*1 -1*60 bPawn*1 bKing*1

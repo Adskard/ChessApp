@@ -16,23 +16,47 @@ public class TurnHistory {
     //could add Board atribute in the future for past viewing
     private final ArrayList<ChessPiece> piecesMoved;
     private final ArrayList<Coordinates> destinations;
+    private final ArrayList<Coordinates> startPos;
+    private final ArrayList<String> movesInPgn;
+    private int turn;
     
     public TurnHistory(){
         this.piecesMoved = new ArrayList();
         this.destinations = new ArrayList();
+        this.startPos = new ArrayList();
+        this.movesInPgn = new ArrayList<>();
+        this.turn = 0;
     }
     
     public TurnHistory(TurnHistory original){
         this.piecesMoved = new ArrayList();
         this.destinations = new ArrayList();
+        this.startPos = new ArrayList();
+        this.movesInPgn = new ArrayList<>();
         this.destinations.addAll(original.getDestinations());
         this.piecesMoved.addAll(original.getPiecesMoved());
+        this.turn = original.getTurn();
+        this.movesInPgn.addAll(original.getMovesInPgn());
+        this.startPos.addAll(original.getStartPos());
     }
     
-    public void addEntry(ChessPiece piece, Coordinates dest){
+    public void addEntry(ChessPiece piece, Coordinates dest, Coordinates start){
         this.piecesMoved.add(piece);
         this.destinations.add(dest);
+        this.startPos.add(start);
+        this.turn += piecesMoved.size() % 2;
+        
     }
+    
+    public void updatePgnNotation(Board board, boolean takes, boolean castleQ, boolean castleK, boolean promo){
+        ChessPiece piece = this.piecesMoved.get(piecesMoved.size() - 1);
+        Coordinates dest = this.destinations.get(this.destinations.size() - 1);
+        Coordinates start = this.startPos.get(this.startPos.size() - 1);
+        
+        this.movesInPgn.add(PgnParser.enocodeMoveToPgn(piece, dest, start, board, takes, castleQ, castleK, promo));
+    }
+    
+
     
     @Override
     public String toString(){
@@ -54,5 +78,29 @@ public class TurnHistory {
     }
     public ArrayList<Coordinates> getDestinations(){
         return this.destinations;
+    }
+
+    public ArrayList<String> getMovesInPgn() {
+        return movesInPgn;
+    }
+    
+    public String getWholeGamePgn(){
+        String game = "";
+        for (int i = 0; i < movesInPgn.size(); i++) {
+            if(i % 2 == 0){
+                game += i/2 + 1;
+                game +=". ";
+            }
+            game += movesInPgn.get(i) + " ";
+        }
+        return game;
+    }
+
+    public ArrayList<Coordinates> getStartPos() {
+        return startPos;
+    }
+
+    public int getTurn() {
+        return turn;
     }
 }

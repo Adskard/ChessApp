@@ -6,8 +6,11 @@
 package cz.cvut.fel.skardada.chess;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.logging.*;
+import org.apache.commons.io.IOUtils;
 /**
  *
  * @author Adam Škarda
@@ -17,7 +20,7 @@ public class ChessController implements Runnable{
     private Game game;
     private MainView mainView;
     private BoardView boardView;
-    private static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static Logger logger = Logger.getLogger(ChessController.class.getName());
     
     public ChessController(){
         
@@ -32,50 +35,66 @@ public class ChessController implements Runnable{
     }
     
     public void run(){
-        //Initializing view for user options
-        mainView = new MainView();
-        mainView.setVisible(true);
-  
-        //Wait for to input options and start the game
-        synchronized(this){
-            while(!mainView.ready){
-                try{
-                  this.wait(100);  
-                }
-                catch(Exception E){
-                    System.err.println(E.getMessage());
+        //Escape option of this while loop is closing the view window
+        while(true){
+            
+            //Initializing view for user options
+            if(mainView == null){
+                mainView = new MainView();
+            }
+            mainView.setVisible(true);
+
+            //Wait for to input options and start the game
+            synchronized(this){
+                while(!mainView.isReady()){
+                    try{
+                      this.wait(100);  
+                    }
+                    catch(Exception E){
+                        System.err.println(E.getMessage());
+                    }
                 }
             }
-        }
-        
-        //Set up the game model
-        this.setUpTheGame();
-        
-        //Options nolonger visible, but not terminated - can be used after game ends
-        mainView.setVisible(false);
-        
-        //Initialize game board view
-        this.boardView = new BoardView(this.game);
-        
-        //wait for the board to initialize
-        synchronized(this){
-            while(!boardView.ready){
-                try{
-                  this.wait(100);  
-                }
-                catch(Exception E){
-                    System.err.println(E.getMessage());
+            
+            //for the next game
+            mainView.setReady(false);
+
+            //Set up the game model
+            this.setUpTheGame();
+
+            //Options nolonger visible, but not terminated - can be used after game ends
+            mainView.setVisible(false);
+
+            //Initialize game board view
+            this.boardView = new BoardView(this.game);
+
+            //wait for the board to initialize
+            synchronized(this){
+                while(!boardView.ready){
+                    try{
+                      this.wait(10);  
+                    }
+                    catch(Exception E){
+                        System.err.println(E.getMessage());
+                    }
                 }
             }
+
+            //Start the chess game
+            this.startTheGame();  
         }
         
-        //Start the chess game
-        this.startTheGame();
     }
     
     private void setUpTheGame(){
+        String stylePath = "";
         //change this to change chessStyle
-        String stylePath = ChessController.class.getResource("/style_standard.ser").toExternalForm().substring(6);
+        try {
+            stylePath = ChessController.class.getResource("/style_standard.ser").toURI().getPath();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(ChessController.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(-1);
+        }
         ChessStyle style = this.loadGameStyle(stylePath);  
         
         ArrayList<Player> players = new ArrayList<>();
@@ -172,13 +191,21 @@ public class ChessController implements Runnable{
             //last player standing wins
             if(players.size() == 1){
                 winner = players.get(0);
-                System.out.println("WINNER IS PLAYER "+ winner.getColor());
+                boolean export = boardView.showWinnerWindow("Winner is " + winner.getName() + " with " + winner.getColor() + " pieces!");
+                if(export){
+                    this.exportPgnGame();
+                }
+                exitBoardToMain();
                 return;
             } 
             
             // DRAW - THREE fold repetition isnt automatic, but agreed uppon by players - its not part of this project
             if(noMovesDraw || insufficientMatDraw){
-                System.out.println("DRAW");
+                boolean export = boardView.showWinnerWindow("This Game is a draw!");
+                if(export){
+                    this.exportPgnGame();
+                }
+                exitBoardToMain();
                 return;
             }
             
@@ -254,6 +281,7 @@ public class ChessController implements Runnable{
             System.err.print("Could not find class " + ex.getMessage());
             return null;
         }
+        System.out.println(style.getName());
         return style;
     }
     
@@ -266,7 +294,7 @@ public class ChessController implements Runnable{
     }
     
     private void exportPgnGame(){
-        //TODO
+        System.out.println(this.game.getGameBoard().getHistory().getWholeGamePgn());
     }
     
     private void saveGame(){
@@ -277,7 +305,9 @@ public class ChessController implements Runnable{
         //TODO
     }
     
-    private void announceWinner(){
-        //TODO
+    public void exitBoardToMain(){
+        this.mainView.setVisible(true);
+        this.game = null;
+        this.boardView = null;
     }
 }

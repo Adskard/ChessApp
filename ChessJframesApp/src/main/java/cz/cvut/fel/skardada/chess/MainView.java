@@ -23,7 +23,8 @@ public class MainView extends javax.swing.JFrame {
     private PossibleOpponents p2Type;
     private String p1name;
     private String p2name;
-    public boolean ready = false;
+    private boolean ready = false;
+    private boolean start = false;
     /**
      * Creates new form mainView
      */
@@ -65,6 +66,7 @@ public class MainView extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Super Duper Chess\n");
 
         p1TypeChooser.setModel(new javax.swing.DefaultComboBoxModel<>(PossibleOpponents.values()));
         p1TypeChooser.addItemListener(new java.awt.event.ItemListener() {
@@ -431,6 +433,10 @@ public class MainView extends javax.swing.JFrame {
         return p1time;
     }
 
+    public boolean isStart() {
+        return start;
+    }
+
     public String getP2time() {
         return p2time;
     }
@@ -465,6 +471,10 @@ public class MainView extends javax.swing.JFrame {
 
     public String getP2name() {
         return p2name;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
     }
 
     public boolean isReady() {

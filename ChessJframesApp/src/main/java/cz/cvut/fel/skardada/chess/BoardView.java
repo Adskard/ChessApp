@@ -10,6 +10,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 import javax.imageio.*;
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -129,7 +130,7 @@ public class BoardView{
     }
     
     private void updateHistory(){
-        history.setListData(modelGame.getGameBoard().getHistory().getDestinations().toArray());
+        history.setListData(modelGame.getGameBoard().getHistory().getMovesInPgn().toArray());
     }
     
     public void repaintFromModel(){
@@ -142,7 +143,12 @@ public class BoardView{
                 JButton square = this.boardSquares[i][j];
                 if(modelBoard.getBoard()[i][j] != null){
                     String imagePath = modelBoard.getBoard()[i][j].getImagePath();
-                    String fullImagePath = BoardView.class.getResource(imagePath).toExternalForm().substring(6) ;
+                    String fullImagePath = null;
+                    try {
+                        fullImagePath = BoardView.class.getResource(imagePath).toURI().getPath();
+                    } catch (URISyntaxException ex) {
+                        Logger.getLogger(BoardView.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     try{
                       BufferedImage image = ImageIO.read(new File(fullImagePath));  
                       square.setIcon(new ImageIcon(image));
@@ -192,7 +198,7 @@ public class BoardView{
         JButton saveButton = new JButton("Save");
         optionsPanel.add(saveButton, BorderLayout.PAGE_START);
         
-        history = new JList(modelGame.getGameBoard().getHistory().getDestinations().toArray());
+        history = new JList(modelGame.getGameBoard().getHistory().getMovesInPgn().toArray());
         history.setLayoutOrientation(JList.VERTICAL);
         history.setVisibleRowCount(10);
         history.setSize(200, 500);
@@ -272,7 +278,12 @@ public class BoardView{
                 //getting squre content
                 if(modelBoard.getBoard()[i][j] != null){
                     String imagePath = modelBoard.getBoard()[i][j].getImagePath();
-                    String fullImagePath = BoardView.class.getResource(imagePath).toExternalForm().substring(6) ;
+                    String fullImagePath = null;
+                    try {
+                        fullImagePath = BoardView.class.getResource(imagePath).toURI().getPath();
+                    } catch (URISyntaxException ex) {
+                        Logger.getLogger(BoardView.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     try{
                       BufferedImage image = ImageIO.read(new File(fullImagePath));  
                       square.setIcon(new ImageIcon(image));
@@ -284,10 +295,10 @@ public class BoardView{
                 
                 //coloring squares
                 if((j % 2 == 1 && i % 2 == 1) || (j % 2 == 0 && i % 2 == 0)){
-                 square.setBackground(Color.WHITE);
+                 square.setBackground(new Color(45, 83, 108));
                  }
                  else{
-                     square.setBackground(new Color(45, 83, 108));
+                     square.setBackground(Color.WHITE);
                  } 
                 
                 //adding to collections
@@ -297,17 +308,29 @@ public class BoardView{
         }
     }
     
-    private void addComponentsToGridBag(Component addedComponent, Container container, GridBagLayout layout, GridBagConstraints gbc, int x, int y, int width, int heigth, int fill, int anchor){
-        gbc.gridx = x;
-        gbc.gridy = y;
-
-        gbc.gridwidth = width;
-        gbc.gridheight = heigth;
+    public boolean showWinnerWindow(String resultMsg){
+        //two options to choose from
+        String[] options = new String[2];
+        options[0] = "Export";
+        options[1] = "To Main Menu";
         
-        gbc.fill = fill;
-        gbc.anchor = anchor;
-
-        layout.setConstraints(addedComponent, gbc);
-        container.add(addedComponent);
+        //show endGame dialog window with export option
+        int n = JOptionPane.showOptionDialog(frame, resultMsg,"Who won?",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        
+        //export the game
+        if(n == JOptionPane.YES_OPTION){
+            this.frame.setVisible(false);
+            this.frame.dispose();
+            return true;
+        }
+        
+        //return to main menu without exporting
+        if(n == JOptionPane.NO_OPTION || n == JOptionPane.CLOSED_OPTION){
+            this.frame.setVisible(false);
+            this.frame.dispose();
+        }
+        return false;
     }
+
 }

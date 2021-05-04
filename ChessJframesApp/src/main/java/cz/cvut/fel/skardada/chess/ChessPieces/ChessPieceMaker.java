@@ -116,6 +116,7 @@ public class ChessPieceMaker {
         //save path - default resources folder - SUBSTITUTE FOR YOUR OWN PATH if there is nullPointerError while serializing
         String savedPiecesPath = ".\\src\\main\\resources\\";
         
+        
         //serialize created piece
         try{
             FileOutputStream chessSer = new FileOutputStream(savedPiecesPath + "piece_" + pieceName +  ".ser");

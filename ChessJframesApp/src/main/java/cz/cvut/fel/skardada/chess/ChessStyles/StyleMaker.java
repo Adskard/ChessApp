@@ -11,6 +11,10 @@ package cz.cvut.fel.skardada.chess.ChessStyles;
  */
 import cz.cvut.fel.skardada.chess.*;
 import java.io.*;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.cli.*;
 public class StyleMaker {
 
@@ -70,7 +74,12 @@ public class StyleMaker {
         board = new ChessPiece[size][size];
         
         //setting up chess pieces for usage
-        String pieceDirectory = StyleMaker.class.getResource("/").toString().substring(6);
+        String pieceDirectory = null;
+        try {
+            pieceDirectory = StyleMaker.class.getResource("/").toURI().getPath();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(StyleMaker.class.getName()).log(Level.SEVERE, "path to ChessPieces not found", ex);
+        }
         String piecePrefix = "piece_";
         String pieceSuffix = ".ser";
         String[] availablePieces = null;
@@ -194,11 +203,14 @@ public class StyleMaker {
         }
         
         //path where to save serialized style - if this doesnt work (cant find system Path) - substitute this for your own absolute path
-        String styleDirectory = "D:\\Projects\\Java\\Semestralka_PJV\\ChessJframesApp\\src\\main\\resources\\";
+        String styleDirectory = "D:\\Projects\\Java\\Semestralka PJV\\ChessJframesApp\\src\\main\\resources";
+        File f = new File(styleDirectory);
+        System.out.println(f.getAbsolutePath());
+        System.out.println(Arrays.toString(f.list()));
         
         //serialize
         try{
-            FileOutputStream styleSer = new FileOutputStream(styleDirectory + "style_" + name +  ".ser");
+            FileOutputStream styleSer = new FileOutputStream(f.getAbsolutePath() + "/" + "style_" + name +  ".ser");
             ObjectOutputStream out = new ObjectOutputStream(styleSer);
             out.writeObject(style);
             out.close();

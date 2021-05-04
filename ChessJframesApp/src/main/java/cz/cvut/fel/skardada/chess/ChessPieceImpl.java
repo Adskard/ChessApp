@@ -5,7 +5,6 @@
  */
 package cz.cvut.fel.skardada.chess;
 
-import java.awt.image.BufferedImage;
 /**
  *
  * @author Adam Škarda

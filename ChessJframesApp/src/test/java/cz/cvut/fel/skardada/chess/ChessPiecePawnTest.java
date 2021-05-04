@@ -21,42 +21,36 @@ public class ChessPiecePawnTest {
      * Test of doublePass method, of class ChessPiecePawn.
      */
     @Test
-    public void testConstructor_white_vector01(){
+    public void testConstructor_whitePawn_vector10Distance1(){
         //arrange
         Coordinates pos = new Coordinates(1,1);
-        Coordinates[] expRes = new Coordinates[]{new Coordinates(1,0)};
+        Coordinates[] expVectors = new Coordinates[]{new Coordinates(1,0)};
+        int expDistance = 1;
         PlayerColors color = PlayerColors.white;
+        
         //act
         ChessPiecePawn pawn = new ChessPiecePawn(pos,color);
+        
         //assert
-        assertArrayEquals(expRes, pawn.getMoveSet().getMoveVectors() );
+        assertArrayEquals(expVectors, pawn.getMoveSet().getMoveVectors());
+        assertEquals(expDistance, pawn.getMoveSet().getMoveDistance());
     }
     /**
      * Test of doublePass method, of class ChessPiecePawn.
      */
      @Test
-    public void testConstructor_black_vector0neg1(){
+    public void testConstructor_blackPawn_vectorNeg10Distnace1(){
         //arrange
         Coordinates pos = new Coordinates(1,1);
         PlayerColors color = PlayerColors.black;
-        Coordinates[] expRes = new Coordinates[]{new Coordinates(-1,0)};
+        Coordinates[] expVectors = new Coordinates[]{new Coordinates(-1,0)};
+        int expDistance = 1;
+        
         //act
         ChessPiecePawn pawn = new ChessPiecePawn(pos,color);
+        
         //assert
-        assertArrayEquals(expRes, pawn.getMoveSet().getMoveVectors() );
-    }
-    
-    
-    @Test
-    public void testConstructor_coorectFilePathToImg_imgInResources(){
-        //arrange
-        ProcessBuilder pb = new ProcessBuilder("resources/piece_blackPawn.ser");
-        Class clas = ChessPiecePawn.class;
-        URL path = ChessPiecePawn.class.getResource("/piece_blackRook.ser");
-        System.out.println(path);
-        //act
-        //ChessPiecePawn pawn = new ChessPiecePawn(pos,color);
-        //assert
-        //assertEquals(expRes, pawn.getMoveSet().getMoveVectors() );
+        assertArrayEquals(expVectors, pawn.getMoveSet().getMoveVectors() );
+        assertEquals(expDistance, pawn.getMoveSet().getMoveDistance());
     }
 }
