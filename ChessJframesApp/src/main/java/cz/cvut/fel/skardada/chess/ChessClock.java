@@ -32,7 +32,10 @@ public class ChessClock implements Runnable{
         if (timeFlows) {
             timeFlows = false;
         }
-        timer += increment;
+        if(timer>0){
+          timer += increment;  
+        }
+
     }
     
     public void run(){

@@ -53,7 +53,7 @@ public class TurnHistory {
         Coordinates dest = this.destinations.get(this.destinations.size() - 1);
         Coordinates start = this.startPos.get(this.startPos.size() - 1);
         
-        this.movesInPgn.add(PgnParser.enocodeMoveToPgn(piece, dest, start, board, takes, castleQ, castleK, promo));
+        this.movesInPgn.add(PgnParser.encodeMoveToPgn(piece, dest, start, board, takes, castleQ, castleK, promo));
     }
     
 
@@ -84,17 +84,6 @@ public class TurnHistory {
         return movesInPgn;
     }
     
-    public String getWholeGamePgn(){
-        String game = "";
-        for (int i = 0; i < movesInPgn.size(); i++) {
-            if(i % 2 == 0){
-                game += i/2 + 1;
-                game +=". ";
-            }
-            game += movesInPgn.get(i) + " ";
-        }
-        return game;
-    }
 
     public ArrayList<Coordinates> getStartPos() {
         return startPos;

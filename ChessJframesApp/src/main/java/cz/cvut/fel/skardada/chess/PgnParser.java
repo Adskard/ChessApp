@@ -10,6 +10,7 @@ package cz.cvut.fel.skardada.chess;
  * @author Adam Škarda
  */
 
+import java.util.ArrayList;
 import java.util.logging.*;
 public class PgnParser {
     private static Logger logger = Logger.getLogger(PgnParser.class.getName());
@@ -27,7 +28,7 @@ public class PgnParser {
         
     }
     
-    public static String enocodeMoveToPgn(ChessPiece movedPiece, Coordinates dest, Coordinates start, Board board, boolean takes, boolean castleQ, boolean castleK, boolean promotion){
+    public static String encodeMoveToPgn(ChessPiece movedPiece, Coordinates dest, Coordinates start, Board board, boolean takes, boolean castleQ, boolean castleK, boolean promotion){
         String pgnNotation = "";
         String pieceName = movedPiece.getName().toLowerCase();
         String pieceNotation = findPgnNotationForPiece(pieceName);
@@ -96,11 +97,38 @@ public class PgnParser {
         return pgnNotation;
     }
     
-    private String encodeGameToPgn(Game game){
+    public static String encodeGameToPgn(Game game, PlayerColors winner){
         if(!game.getStyle().getName().equals("standard")){
             return null;
         }
-        return "";
+        
+        //tags
+        String result = "1/2-1/2";
+        if (winner == PlayerColors.black) {
+            result = "0-1";
+        }
+        if (winner == PlayerColors.white){
+            result = "1-0";
+        }
+        String notation = "";
+        notation += "[Round \"" + game.getGameBoard().getHistory().getTurn() + "\"]" + System.lineSeparator();
+        for (Player p : game.getPlayers()) {
+            notation +="[" +p.getColor().toString().substring(0,1).toUpperCase() + p.getColor().toString().substring(1) + " \"" + p.getName() +  "\"]" + System.lineSeparator();
+        }
+        notation += "[Result \"" + result +"\"]" + System.lineSeparator();
+        
+        //game
+        notation += System.lineSeparator();
+        ArrayList<String> gameNotation = game.getGameBoard().getHistory().getMovesInPgn();
+        for (int i = 0; i < gameNotation.size(); i++) {
+            if(i % 2 == 0){
+                notation += (i/2 + 1) + ". ";
+            }
+            notation += gameNotation.get(i);
+            notation += " ";
+        }
+        
+        return notation;
     }
     
     public static String findPgnNotationForPiece(String pieceNameOrg){

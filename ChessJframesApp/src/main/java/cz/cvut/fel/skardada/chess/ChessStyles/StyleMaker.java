@@ -201,16 +201,13 @@ public class StyleMaker {
             System.err.println("Could not create chess style " + ex.getMessage());
             System.exit(-1);
         }
-        
+        //creating relative for some reason doesnt work - it works in ChessPieceMaker - not here 
         //path where to save serialized style - if this doesnt work (cant find system Path) - substitute this for your own absolute path
-        String styleDirectory = "D:\\Projects\\Java\\Semestralka PJV\\ChessJframesApp\\src\\main\\resources";
-        File f = new File(styleDirectory);
-        System.out.println(f.getAbsolutePath());
-        System.out.println(Arrays.toString(f.list()));
+        String styleDirectory = "D:\\Škola - ČVUT\\Java\\Semestrální práce\\ChessJframesApp\\src\\main\\resources";
         
         //serialize
         try{
-            FileOutputStream styleSer = new FileOutputStream(f.getAbsolutePath() + "/" + "style_" + name +  ".ser");
+            FileOutputStream styleSer = new FileOutputStream(styleDirectory + "/" + "style_" + name +  ".ser");
             ObjectOutputStream out = new ObjectOutputStream(styleSer);
             out.writeObject(style);
             out.close();

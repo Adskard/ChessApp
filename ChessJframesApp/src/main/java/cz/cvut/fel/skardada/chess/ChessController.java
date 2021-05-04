@@ -168,10 +168,10 @@ public class ChessController implements Runnable{
                 
                 //player is mated
                 if(p.isMated()){
-                    System.out.println(p.getColor() + " mated");
+                    logger.log(Level.INFO, "{0} mated", p.getColor());
                     playersToRemove.add(p);
+                    break;
                 }
-                
                 
                 else{
                     
@@ -192,8 +192,9 @@ public class ChessController implements Runnable{
             if(players.size() == 1){
                 winner = players.get(0);
                 boolean export = boardView.showWinnerWindow("Winner is " + winner.getName() + " with " + winner.getColor() + " pieces!");
+                players.addAll(playersToRemove);
                 if(export){
-                    this.exportPgnGame();
+                    this.exportPgnGame(winner.getColor() );
                 }
                 exitBoardToMain();
                 return;
@@ -203,7 +204,7 @@ public class ChessController implements Runnable{
             if(noMovesDraw || insufficientMatDraw){
                 boolean export = boardView.showWinnerWindow("This Game is a draw!");
                 if(export){
-                    this.exportPgnGame();
+                    this.exportPgnGame(null);
                 }
                 exitBoardToMain();
                 return;
@@ -293,8 +294,8 @@ public class ChessController implements Runnable{
         //TODO
     }
     
-    private void exportPgnGame(){
-        System.out.println(this.game.getGameBoard().getHistory().getWholeGamePgn());
+    private void exportPgnGame(PlayerColors winner){
+        System.out.println(PgnParser.encodeGameToPgn(this.game, winner));
     }
     
     private void saveGame(){

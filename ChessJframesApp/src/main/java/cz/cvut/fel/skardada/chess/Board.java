@@ -133,6 +133,7 @@ public class Board {
             Coordinates enemyPawnCoord = new Coordinates(dest.getX() - movingPiece.getMoveSet().getMoveVectors()[0].getX(),dest.getY());
             this.getChessPieceAtCoordinate(enemyPawnCoord).setPosition(new Coordinates(-1,-1));
             this.board[enemyPawnCoord.getX()][enemyPawnCoord.getY()] = null; 
+            takes = true;
         }
         
         //move rook for castles
