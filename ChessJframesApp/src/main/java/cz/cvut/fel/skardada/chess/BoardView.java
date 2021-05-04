@@ -10,7 +10,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 import javax.imageio.*;
 import java.io.File;
-import java.io.IOException;
+import java.util.logging.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -37,6 +37,10 @@ public class BoardView{
     private boolean redraw = false;
     public boolean ready = false;
     private JFileChooser saveDialog;
+    private boolean manual = false;
+    private JButton manualSetUpDoneButton;
+    private JPanel optionsPanel;
+    private final Logger logger = Logger.getLogger(BoardView.class.getName());
     
     public BoardView(Game game) {
         this.modelGame = game;
@@ -64,7 +68,11 @@ public class BoardView{
             }
         }
         this.currentPlayer.setFinishedTurn(true);
-
+    }
+    
+    private void manualMoveChessPiece(Coordinates source, Coordinates dest){
+        this.modelBoard.movePieceAnywhere(source, dest);
+        repaintFromModel();
     }
     
     private ChessPiece promotionPopUp(){
@@ -89,6 +97,22 @@ public class BoardView{
         public void actionPerformed(ActionEvent e){
             JButton square = (JButton)e.getSource();
             Coordinates squareCoordinates = new Coordinates(Integer.parseInt(square.getName().substring(0,1)),Integer.parseInt(square.getName().substring(1,2)));
+            if(manual){
+                if(chosenSquareCoords == null){ 
+                    int x = Integer.parseInt(square.getName().substring(0, 1));
+                    int y = Integer.parseInt(square.getName().substring(1, 2));
+                    if(modelBoard.getBoard()[x][y] == null){
+                        return;
+                    }
+                    chosenSquareCoords = new Coordinates(Integer.parseInt(square.getName().substring(0,1)),Integer.parseInt(square.getName().substring(1,2)));
+                    return;
+                }
+                else {
+                    manualMoveChessPiece(chosenSquareCoords, squareCoordinates);
+                    chosenSquareCoords = null;
+                    return;
+                }
+            }
             
             //second click on wrong squares - not available squares
             if(chosenSquareCoords != null && !availableSquares.contains(square)){
@@ -111,9 +135,9 @@ public class BoardView{
             }
             
            //Check who clicked and if he can move the clicked piece
-            if(chosenSquareCoords != null && modelBoard.getBoard()[chosenSquareCoords.getX()][chosenSquareCoords.getY()].getColor() == currentPlayer.getColor() && currentPlayer.isCurrentlyPlaying()){
+            if((currentPlayer != null) && chosenSquareCoords != null && modelBoard.getBoard()[chosenSquareCoords.getX()][chosenSquareCoords.getY()].getColor() == currentPlayer.getColor() && currentPlayer.isCurrentlyPlaying()){
                 //second click to move
-                if((currentPlayer != null) && availableSquares.contains(square)){
+                if(availableSquares.contains(square)){
                     availableSquares.clear();
                     moveChessPiece(chosenSquareCoords, squareCoordinates);
                     chosenSquareCoords = null;
@@ -137,8 +161,23 @@ public class BoardView{
     }
     
     public void repaintFromModel(){
-        
-        updateHistory();
+        if (manual) {
+            if (manualSetUpDoneButton == null) {
+                manualSetUpDoneButton = new JButton("Done Setting Up");
+                manualSetUpDoneButton.setBackground(Color.red);
+                this.p1.add(manualSetUpDoneButton);
+                manualSetUpDoneButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        manual = false;
+                        frame.dispose();
+                    }
+                });
+            }
+        }
+        else{
+           updateHistory(); 
+        }
         
         //synchronizes squares from model and squares from view view
         for (int i = 0; i < boardSquares.length; i++) {  
@@ -196,7 +235,7 @@ public class BoardView{
         
         //components of options and history part - left side
         
-        JPanel optionsPanel = new JPanel(new BorderLayout(30, 60));
+        optionsPanel = new JPanel(new BorderLayout(30, 60));
         
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(new ActionListener() {
@@ -347,5 +386,14 @@ public class BoardView{
         String path = saveDialog.getSelectedFile().getAbsolutePath();
         return path;
     }
+
+    public boolean isManual() {
+        return manual;
+    }
+
+    public void setManual(boolean manual) {
+        this.manual = manual;
+    }
+    
 
 }

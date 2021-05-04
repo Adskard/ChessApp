@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.*;
 public class PgnParser {
-    private static Logger logger = Logger.getLogger(PgnParser.class.getName());
+    private static final Logger logger = Logger.getLogger(PgnParser.class.getName());
     
     private Game parse(){
         return null;
@@ -42,9 +42,8 @@ public class PgnParser {
             return "O-O-O";
         }
         if(promotion){
-            String promotedTo = findPgnNotationForPiece(board.getChessPieceAtCoordinate(dest).getName().toLowerCase());
-            logger.log(Level.FINEST, "Pawn promoted to {0}", board.getChessPieceAtCoordinate(dest).getName());
             return dest.toString() + "=";
+            //rest of the promotion is done during the promotion in Board:promotion()
         }
         
         pgnNotation += pieceNotation;

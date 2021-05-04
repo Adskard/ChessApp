@@ -17,6 +17,7 @@ public class Board {
     private final TurnHistory history; 
     private final ArrayList<ChessPiece> uniquePieces;
     private static Logger logger = Logger.getLogger(Board.class.getName());
+    private ArrayList<Coordinates> allCoordinates;
 
     public Board(int size, ChessPiece[][] arrangement) {
         this.size = size;
@@ -112,7 +113,51 @@ public class Board {
         }
     }
     
-    //Do the moves, controll if they CAN be made somwhere else
+    public void updateMovesToAnyCoordinate(){
+        //make list of all possible moves
+        if (allCoordinates == null) {
+            allCoordinates = new ArrayList<>();
+            for(int i = 0; i < this.size; i++){
+                for(int j = 0; i < this.size; j++){
+                    allCoordinates.add(new Coordinates(i,j));
+                }
+            } 
+        }
+        //give all possible moves to all pieces
+        for(ChessPiece[] row : this.board){
+            for(ChessPiece piece : row){
+                if (piece != null) {
+                    piece.setLegalMoves(allCoordinates); 
+                    piece.setAvailableMoves(allCoordinates);
+                } 
+            }
+        }
+        
+    }
+    
+    //for manual game setup
+    public void movePieceAnywhere(Coordinates startPos, Coordinates dest){
+        
+        if(this.getChessPieceAtCoordinate(startPos) == null){
+            return;
+        }
+        ChessPiece movingPiece = this.getChessPieceAtCoordinate(startPos);
+        if(this.getChessPieceAtCoordinate(dest) == null){
+            this.board[dest.getX()][dest.getY()] = movingPiece;
+            movingPiece.setPosition(dest);
+            this.board[startPos.getX()][startPos.getY()] = null;
+        }
+        
+        //moving to an occupied square
+        else{
+            this.getChessPieceAtCoordinate(dest).setPosition(new Coordinates(-1,-1));
+            this.board[dest.getX()][dest.getY()] = movingPiece;
+            movingPiece.setPosition(dest);
+            this.board[startPos.getX()][startPos.getY()] = null;
+        }
+    }
+    
+    //Do the moves, controll special moves can be played
     public void movePiece(Coordinates startPos, Coordinates dest){
         
         //help for notation
@@ -141,7 +186,7 @@ public class Board {
             ArrayList<Coordinates> castleLocations = FutureStatesGen.checkCastle(this, (ChessPieceKing)movingPiece);
             int distanceTraveledByKing = 2;
             
-            //TODO - NAIVE IMPLEMENTATION REDO
+            //TODO - NAIVE IMPLEMENTATION - make it beter next time (generalize)
             for(Coordinates newKingCoord : castleLocations){
                 if(newKingCoord.equals(dest)){
                     

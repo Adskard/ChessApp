@@ -58,21 +58,66 @@ public class ChessController implements Runnable{
             
             //for the next game
             mainView.setReady(false);
+            if(mainView.isManualSetup()){
+                mainView.setManualSetup(false);
+                this.manualSetUp();
+                logger.log(Level.INFO, "Manual set up selected");
+            }
             
             if(mainView.isNormalStart()){
+                mainView.setNormalStart(false);
                 this.normalStart();
+                logger.log(Level.INFO, "Normal start selected");
             }
             if (mainView.isLoadGame()) {
-                
+                mainView.setLoadGame(false);
+                String path = mainView.showOpenDialog();
+            }
+            if(mainView.isPgnView()){
+                mainView.setPgnView(false);
+                String path = mainView.showOpenDialog();
             }
 
         }
         
     }
     
+    private void manualSetUp(){
+        this.mainView.setEnabled(false);
+        normalGameSetup();
+        this.boardView = new BoardView(this.game);
+
+        //wait for the board to initialize
+        synchronized(this){
+            while(!boardView.ready){
+                try{
+                  Thread.sleep(10);  
+                }
+                catch(Exception E){
+                    System.err.println(E.getMessage());
+                }
+            }
+        }
+        boardView.setManual(true);
+        while(boardView.isManual()){
+            try{
+                Thread.sleep(10);  
+            }
+            catch(Exception E){
+                System.err.println(E.getMessage());
+            }
+        }
+        this.boardView = null;
+        this.game.getGameBoard().updatePieces();
+        this.mainView.setEnabled(true);
+    }
+    
     private void normalStart(){
         //Set up the game model
-        this.normalGameSetup();
+        if (this.game == null) {
+           this.normalGameSetup();  
+        }
+        
 
         //Options nolonger visible, but not terminated - can be used after game ends
         mainView.setVisible(false);
@@ -296,9 +341,6 @@ public class ChessController implements Runnable{
         return style;
     }
     
-    private void manualSetUp(){
-        //TODO
-    }
     
     private void importPgnGame(){
         //TODO
