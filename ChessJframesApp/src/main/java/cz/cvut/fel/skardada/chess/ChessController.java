@@ -6,11 +6,10 @@
 package cz.cvut.fel.skardada.chess;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.*;
-import org.apache.commons.io.IOUtils;
 /**
  *
  * @author Adam Škarda
@@ -20,10 +19,11 @@ public class ChessController implements Runnable{
     private Game game;
     private MainView mainView;
     private BoardView boardView;
-    private static Logger logger = Logger.getLogger(ChessController.class.getName());
+    private static final Logger logger = Logger.getLogger(ChessController.class.getName());
+    private PlayerColors startingPlayer;
+    private String loadedPgnPath;
     
     public ChessController(){
-        
         logger.addHandler(new ConsoleHandler());
     }
     
@@ -34,6 +34,7 @@ public class ChessController implements Runnable{
         mainThread.start();
     }
     
+    @Override
     public void run(){
         //Escape option of this while loop is closing the view window
         while(true){
@@ -72,14 +73,137 @@ public class ChessController implements Runnable{
             if (mainView.isLoadGame()) {
                 mainView.setLoadGame(false);
                 String path = mainView.showOpenDialog();
+                try {
+                    loadGameStart(path);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(ChessController.class.getName()).log(Level.SEVERE, "Saved game was not found ", ex);
+                } catch (Exception ex) {
+                    Logger.getLogger(ChessController.class.getName()).log(Level.SEVERE, "Game could not be loaded ", ex);
+                    this.game = null;
+                }
             }
             if(mainView.isPgnView()){
                 mainView.setPgnView(false);
                 String path = mainView.showOpenDialog();
+                try {
+                    loadedPgnPath = path;
+                    viewPgn(path);
+                } catch (Exception ex) {
+                    Logger.getLogger(ChessController.class.getName()).log(Level.SEVERE, "Could not view this file", ex);
+                    this.game = null;
+                }
             }
 
         }
+    }
+    
+    private Game createFakeGameForView(String pgnPath) throws Exception{
+        String stylePath = "";
+        //change this to change chessStyle, may not work, not fully implemented
+        try {
+            stylePath = ChessController.class.getResource("/style_standard.ser").toURI().getPath();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(ChessController.class.getName()).log(Level.SEVERE, "Could not find game style file", ex);
+            System.exit(-1);
+        }
+        ChessStyle style = this.loadGameStyle(stylePath); 
         
+        //TODO init for n players
+        
+        String blackPlayerName = PgnParser.parsePlayerName(PlayerColors.black, pgnPath);
+        String whitePlayerName = PgnParser.parsePlayerName(PlayerColors.white, pgnPath);
+        
+        
+        ArrayList<Player> players = new ArrayList<>();
+        
+        //TODO future switch case for loading in computer and internet players
+        Player blackPlayer = new Player_Human(blackPlayerName, PlayerColors.black, getPlayerPieces(PlayerColors.black, style), null);
+        players.add(blackPlayer);
+        Player whitePlayer = new Player_Human(whitePlayerName, PlayerColors.white, getPlayerPieces(PlayerColors.white, style), null);
+        players.add(whitePlayer);
+        
+        startingPlayer = PlayerColors.white;
+        
+        return new Game(style, players);
+    }
+    
+    private void loadGameStart(String pathToSave) throws FileNotFoundException, Exception{
+        String stylePath = "";
+        //change this to change chessStyle, may not work, not fully implemented
+        try {
+            stylePath = ChessController.class.getResource("/style_standard.ser").toURI().getPath();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(ChessController.class.getName()).log(Level.SEVERE, "Could not find game style file", ex);
+            System.exit(-1);
+        }
+        ChessStyle style = this.loadGameStyle(stylePath); 
+        
+        //TODO init for n players
+        
+        String blackPlayerName = PgnParser.parsePlayerName(PlayerColors.black, pathToSave);
+        String whitePlayerName = PgnParser.parsePlayerName(PlayerColors.white, pathToSave);
+        
+        ChessClock blackClock = new ChessClock(PgnParser.parseTime(blackPlayerName, pathToSave)[0], PgnParser.parseTime(blackPlayerName, pathToSave)[1]);
+        ChessClock whiteClock = new ChessClock(PgnParser.parseTime(whitePlayerName, pathToSave)[0], PgnParser.parseTime(whitePlayerName, pathToSave)[1]);
+        
+        ArrayList<Player> players = new ArrayList<>();
+        
+        //TODO future switch case for loading in computer and internet players
+        Player blackPlayer = new Player_Human(blackPlayerName, PlayerColors.black, getPlayerPieces(PlayerColors.black, style), blackClock);
+        players.add(blackPlayer);
+        Player whitePlayer = new Player_Human(whitePlayerName, PlayerColors.white, getPlayerPieces(PlayerColors.white, style), whiteClock);
+        players.add(whitePlayer);
+        
+        startingPlayer = PlayerColors.white;
+        
+        this.game = new Game(style, players);
+        String [] turnsTaken = PgnParser.getIndividualMoves(pathToSave);
+        takeTurns(turnsTaken, this.game);
+        this.normalStart();
+    }
+    
+    public Game createFakeGameStateForView(String[] turnsTaken) throws Exception{
+        Game fake = createFakeGameForView(loadedPgnPath);
+        takeTurns(turnsTaken, fake);
+        return fake;
+    }
+    
+    private void viewPgn(String pgnPath) throws Exception{
+        this.game = createFakeGameForView(pgnPath);
+        String [] turnsTaken = PgnParser.getIndividualMoves(pgnPath);
+        takeTurns(turnsTaken, this.game);
+        this.boardView = new BoardView(game, this);
+        synchronized(this){
+            while(!boardView.ready){
+                try{
+                  Thread.sleep(10);  
+                }
+                catch(Exception E){
+                    System.err.println(E.getMessage());
+                }
+            }
+        }
+    }
+    
+    
+    public void takeTurns(String[] turns, Game playedGame) throws Exception{
+        Board board = playedGame.getGameBoard();
+        int currentPlayerIndex = 0;
+        //set starting palyer
+        for(int i = 0; i< playedGame.getPlayers().size(); i++){
+            if(playedGame.getPlayers().get(i).getColor() == startingPlayer){
+                currentPlayerIndex = i;
+                break;
+            }
+        }
+        //game cycle
+        for (int i = 0; i < turns.length; i++) {
+            Player currentPlayer = playedGame.getPlayers().get(currentPlayerIndex % 2);
+            board.movePiece(turns[i], currentPlayer);
+            currentPlayer.updateAvailableMoves();
+            currentPlayerIndex++;
+        }
+        startingPlayer = playedGame.getPlayers().get(currentPlayerIndex % 2).getColor();
     }
     
     private void manualSetUp(){
@@ -147,7 +271,7 @@ public class ChessController implements Runnable{
         try {
             stylePath = ChessController.class.getResource("/style_standard.ser").toURI().getPath();
         } catch (URISyntaxException ex) {
-            Logger.getLogger(ChessController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ChessController.class.getName()).log(Level.SEVERE, "Could not find game style file", ex);
             System.exit(-1);
         }
         ChessStyle style = this.loadGameStyle(stylePath);  
@@ -189,6 +313,8 @@ public class ChessController implements Runnable{
         //Create model game
         players.add(p1);
         players.add(p2);
+        
+        this.startingPlayer = PlayerColors.white;
         this.game = new Game(style, players);
     }
     
@@ -200,10 +326,11 @@ public class ChessController implements Runnable{
         boolean noMovesDraw = false;
         boolean insufficientMatDraw;
         
-        //get starting player - white starts
+        //get starting player - white starts normally - can be changed when game is loaded 
         for(int i = 0; i< players.size(); i++){
-            if(players.get(i).getColor() == PlayerColors.white){
+            if(players.get(i).getColor() == startingPlayer){
                 currentPlayerIndex = i;
+                break;
             }
         }
         
@@ -213,8 +340,7 @@ public class ChessController implements Runnable{
             Player currentPlayer = players.get(currentPlayerIndex);
             insufficientMatDraw = true;
             //diagnostic fucntions
-            printBoard();
-            System.out.println("Current player: " + currentPlayer.getColor().toString());
+            logger.log(Level.INFO, printBoard());
             
             //remove CheckMated player, decide winner of the game
             ArrayList<Player> playersToRemove = new ArrayList();
@@ -299,28 +425,29 @@ public class ChessController implements Runnable{
         return pieces;
     }
     
-    private void printBoard(){
-        System.out.println("[");
+    private String printBoard(){
+        String gameState = "";
+        gameState += "[" + System.lineSeparator();
         for(ChessPiece[] row : this.game.getGameBoard().getBoard()){
-            System.out.print("[");
+            gameState += "[";
             for(ChessPiece piece : row){
                 if(piece == null){
-                   System.out.print("-1");
-                    System.out.print(" | "); 
+                    gameState += "-1";
+                    gameState += " | "; 
                     continue;
                 }
-                System.out.print(piece.toString());
-                System.out.print(piece.getPosition().toString());
-                System.out.print(" | ");
+                gameState += piece.toString();
+                gameState += piece.getPosition().toString();
+                gameState += " | ";
             }
-            System.out.println("]");
+            gameState += "[" + System.lineSeparator();
         }
-        System.out.println("]");
+        gameState += "[" + System.lineSeparator();
+        return gameState;
     }
     
 
     private ChessStyle loadGameStyle(String stylePath){
-        //Get better pathing TODO
         ChessStyle style = null;
         try{
             FileInputStream file = new FileInputStream(stylePath);
@@ -337,27 +464,15 @@ public class ChessController implements Runnable{
             System.err.print("Could not find class " + ex.getMessage());
             return null;
         }
-        System.out.println(style.getName());
         return style;
     }
     
-    
-    private void importPgnGame(){
-        //TODO
-    }
     
     private void exportPgnGame(PlayerColors winner){
         String path = boardView.showSaveDialog();
         PgnParser.exportPgnGameToFile(path, game, winner);
     }
     
-    private void saveGame(){
-        //TODO
-    }
-    
-    private void loadGame(){
-        //TODO
-    }
     
     public void exitBoardToMain(){
         this.mainView.setVisible(true);

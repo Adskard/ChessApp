@@ -113,6 +113,100 @@ public class Board {
         }
     }
     
+    public void movePiece(String pgnMove, Player currentPlayer) throws Exception{
+        this.updatePieces();
+        ArrayList<ChessPiece> availablePieces = currentPlayer.getOwnPieces();
+        Coordinates dest;
+        Coordinates start;
+        String pieceName;
+        
+        //solve castles
+        if(PgnParser.isThisMoveAKingCastle(pgnMove) || PgnParser.isThisMoveAQueenCastle(pgnMove)){
+            pieceName = "King";
+            int rank = currentPlayer.getColor().equals(PlayerColors.black) ? 7 : 0;
+            int file = 4;
+            if (PgnParser.isThisMoveAKingCastle(pgnMove)) {
+                dest = new Coordinates(rank, file + 2);
+            }
+            else{
+                dest = new Coordinates(rank, file - 2);
+            }
+        }
+        else{
+            pieceName = PgnParser.parseMovedPiece(pgnMove);
+            dest = PgnParser.getDestination(pgnMove);
+        }
+        
+        //select all possible pieces with this destination
+        ArrayList<ChessPiece> candidatePieces = new ArrayList<>();
+        for(ChessPiece piece : availablePieces){
+            if (piece.getName().toLowerCase().contains(pieceName.toLowerCase()) && piece.canGetTo(dest)) {
+                candidatePieces.add(piece);
+            }
+        }
+        
+        //solve ambiguity
+        ArrayList<ChessPiece> ambiguousPieces = new ArrayList<>();
+        if(candidatePieces.size() > 1){  
+            for (ChessPiece piece : candidatePieces) {
+                int startCoordsOffset = piece.getName().toLowerCase().contains("pawn") ? 0 : 1;
+                String firstAmbiguity = pgnMove.substring(startCoordsOffset,2 - (1 -startCoordsOffset));
+                if (piece.getPosition().getFile().equals(firstAmbiguity)) {
+                    continue;
+                }
+                else{
+                    if(piece.getPosition().getRank().equals(firstAmbiguity)){
+                        continue;
+                    } 
+                    else{
+                        ambiguousPieces.add(piece);
+                    }
+                }
+                
+            }
+        }
+        
+        candidatePieces.removeAll(ambiguousPieces);
+        ambiguousPieces.clear();
+        
+        //for really ambiguous moves
+        if(candidatePieces.size() > 1){
+            String startCoords = pgnMove.substring(1, 3);
+            for (ChessPiece piece : candidatePieces) {
+                if (piece.getPosition().toString().equals(startCoords)) {
+                    continue;
+                }
+                else{
+                    ambiguousPieces.add(piece);
+                }
+            }
+        }
+        
+        //remove ambiguous pieces
+        candidatePieces.removeAll(ambiguousPieces);
+        
+        //check and move piece if ambiguity is solved
+        if (candidatePieces.size() == 1) {
+            this.movePiece(candidatePieces.get(0).getPosition(), dest);
+        }
+        
+        //else there is a problem with pgn
+        else{
+            logger.log(Level.INFO, "{0} {1} {2}", new Object[]{pgnMove, pieceName, dest});
+            throw new Exception("Pgn parsing ambiguity error: " + candidatePieces.toString());
+        }
+        
+        //check promotions
+        String promotion = PgnParser.isThisMoveAPromotion(pgnMove);
+        if (promotion != null) {
+            for(ChessPiece newRank : this.uniquePieces){
+                if(newRank.getName().toLowerCase().contains(PgnParser.findPieceForPgnNotation(promotion).toLowerCase())){
+                   this.promotion(candidatePieces.get(0), newRank); 
+                }
+            }
+        }
+    }
+    
     public void updateMovesToAnyCoordinate(){
         //make list of all possible moves
         if (allCoordinates == null) {
@@ -383,6 +477,7 @@ public class Board {
         }
         return unique;
     }
+    
     
     public ChessPiece getChessPieceAtCoordinate(Coordinates coord){
         return this.getChessPieceAtPosition(coord.getX(), coord.getY());

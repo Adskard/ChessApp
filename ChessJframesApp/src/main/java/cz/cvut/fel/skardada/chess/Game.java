@@ -22,14 +22,12 @@ public class Game {
         this.gameBoard.updatePieces();
         this.players = players;
     }
-    
-    public Game(Board board, ArrayList<Player> players){
-        this.style = null;
-        this.gameBoard = board;
-        this.gameBoard.updatePieces();
-        this.players = players;
-    }
 
+
+    public void retraceGameHistory(int stepToRetrace){
+        
+    }
+    
     public Board getGameBoard() {
         return gameBoard;
     }

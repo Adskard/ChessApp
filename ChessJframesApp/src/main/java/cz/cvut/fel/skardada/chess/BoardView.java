@@ -10,11 +10,14 @@ import java.awt.event.*;
 import java.awt.image.*;
 import javax.imageio.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 /**
  *
  * @author Adam Škarda
@@ -22,6 +25,7 @@ import java.util.logging.Logger;
 public class BoardView{
     
     private JFrame frame;
+    private ChessController controller;
     private final Board modelBoard;
     private final JButton[][] boardSquares;
     private final Game modelGame;
@@ -42,6 +46,17 @@ public class BoardView{
     private JPanel optionsPanel;
     private final Logger logger = Logger.getLogger(BoardView.class.getName());
     
+    public BoardView(Game game, ChessController control) {
+        this.modelGame = game;
+        this.modelBoard = game.getGameBoard();
+        this.boardSquares = new JButton[modelBoard.getSize()][modelBoard.getSize()];
+        availableSquares = new ArrayList<JButton>();
+        this.saveDialog = new JFileChooser();
+        this.controller = control;
+        initPgnViewing();
+        this.ready = true;
+    }
+    
     public BoardView(Game game) {
         this.modelGame = game;
         this.modelBoard = game.getGameBoard();
@@ -50,6 +65,93 @@ public class BoardView{
         this.saveDialog = new JFileChooser();
         initComponents();
         this.ready = true;
+    }
+    
+    private void initPgnViewing(){
+        //create main frame
+        frame = new JFrame();
+        frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        frame.setSize(800,800);
+        frame.setLayout(new BorderLayout(40, 20));
+        
+        optionsPanel = new JPanel(new BorderLayout(30, 60));
+        
+        JButton saveButton = new JButton("Exit to main menu");
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                controller.exitBoardToMain();
+            }
+        });
+        optionsPanel.add(saveButton, BorderLayout.PAGE_START);
+        
+        history = new JList(modelGame.getGameBoard().getHistory().getMovesInPgn().toArray());
+        history.setLayoutOrientation(JList.VERTICAL);
+        history.setVisibleRowCount(10);
+        history.setSize(200, 500);
+        history.setFixedCellHeight(20);
+        history.setFixedCellWidth(100);
+        history.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        ListSelectionListener historyListener = new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                int selectedIndex = history.getSelectedIndex();
+                String[] moves = new String[selectedIndex + 1];
+                for (int i = 0; i < moves.length; i++) {
+                    moves[i] = (String) history.getModel().getElementAt(i);
+                }
+                try {
+                    displayBoard(controller.createFakeGameStateForView(moves).getGameBoard().getBoard());
+                } catch (Exception ex) {
+                    Logger.getLogger(BoardView.class.getName()).log(Level.SEVERE, "Cannot simulate this move", ex);
+                }
+            }
+        };
+        history.addListSelectionListener(historyListener);
+        optionsPanel.add(new JScrollPane(history), BorderLayout.CENTER);
+        
+        p1 = new JPanel(new FlowLayout(0, 100, 20)); // panel with player name, time, pieces lost
+        p2 = new JPanel(new FlowLayout(0, 100, 20)); // panel with player name, time, pieces lost
+        
+        JLabel p1Name = new JLabel(modelGame.getPlayers().get(0).getName());
+        JLabel p2Name = new JLabel(modelGame.getPlayers().get(1).getName());
+        p1.add(p1Name);
+        p2.add(p2Name);
+        
+        initBoardSquares();
+        frame.add(p1, BorderLayout.PAGE_START);
+        frame.add(chessBoard, BorderLayout.CENTER);
+        frame.add(p2, BorderLayout.PAGE_END);
+        frame.add(optionsPanel, BorderLayout.LINE_END);
+        frame.setVisible(true);
+    }
+    
+    private void displayBoard(ChessPiece[][] modelBoard){
+        for (int i = 0; i < boardSquares.length; i++) {  
+            for (int j = 0; j < boardSquares[i].length; j++) {
+                JButton square = this.boardSquares[i][j];
+                if(modelBoard[i][j] != null){
+                    String imagePath = modelBoard[i][j].getImagePath();
+                    String fullImagePath = null;
+                    try {
+                        fullImagePath = BoardView.class.getResource(imagePath).toURI().getPath();
+                    } catch (URISyntaxException ex) {
+                        Logger.getLogger(BoardView.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    try{
+                      BufferedImage image = ImageIO.read(new File(fullImagePath));  
+                      square.setIcon(new ImageIcon(image));
+                    }
+                    catch(Exception e){
+                        logger.log(Level.SEVERE, "Could not laod Chess piece image {0}", e.getMessage());
+                    }  
+                }
+                else{
+                    square.setIcon(null);
+                }
+            }
+        }
     }
     
     private void moveChessPiece(Coordinates source, Coordinates dest){
@@ -196,7 +298,7 @@ public class BoardView{
                       square.setIcon(new ImageIcon(image));
                     }
                     catch(Exception e){
-                        System.err.println("Could not load Chess piece image "+e.getMessage());
+                        logger.log(Level.SEVERE, "Could not laod Chess piece image {0}", e.getMessage());
                     }  
                 }
                 else{
@@ -327,14 +429,15 @@ public class BoardView{
                     try {
                         fullImagePath = BoardView.class.getResource(imagePath).toURI().getPath();
                     } catch (URISyntaxException ex) {
-                        Logger.getLogger(BoardView.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, "Error finding path to piece image: ", ex);
                     }
                     try{
                       BufferedImage image = ImageIO.read(new File(fullImagePath));  
                       square.setIcon(new ImageIcon(image));
                     }
-                    catch(Exception e){
-                        System.err.println("Could not load Chess piece image "+e.getMessage());
+                    
+                    catch(IOException e){
+                       logger.log(Level.SEVERE, "Error loading chesspiece image: {0}", e);
                     }  
                 }
                 
@@ -393,6 +496,14 @@ public class BoardView{
 
     public void setManual(boolean manual) {
         this.manual = manual;
+    }
+
+    public ChessController getController() {
+        return controller;
+    }
+
+    public void setController(ChessController controller) {
+        this.controller = controller;
     }
     
 

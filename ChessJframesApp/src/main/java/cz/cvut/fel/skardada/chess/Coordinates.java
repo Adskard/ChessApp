@@ -12,7 +12,7 @@ package cz.cvut.fel.skardada.chess;
 public class Coordinates implements java.io.Serializable{
     private final int x;
     private final int y;
-
+    private final int offset;
     /**
      *
      * @param x
@@ -21,6 +21,18 @@ public class Coordinates implements java.io.Serializable{
     public Coordinates(int x,int y) {
         this.x = x; //row
         this.y = y; //column
+        this.offset = 97; //char offset
+    }
+    
+    public Coordinates(String pgn) throws Exception{
+        this.offset = 97;
+        if(pgn.length() != 2){
+            throw new Exception("Incorrect coordinate format");
+        }
+        else{
+            this.x = Integer.parseInt(pgn.substring(1)) - 1;
+            this.y = (int) pgn.charAt(0) - offset;
+        }
     }
 
     /**
@@ -30,7 +42,6 @@ public class Coordinates implements java.io.Serializable{
     @Override
     public String toString(){
         String str;
-        int offset = 97;
         str =  (char)(offset + this.y) + Integer.toString((this.x + 1));
         return str;
     }
@@ -69,7 +80,7 @@ public class Coordinates implements java.io.Serializable{
     }
     
     public String getFile(){
-        return Character.toString((char)(97 + this.y));
+        return Character.toString((char)(offset + this.y));
     }
 
     /**

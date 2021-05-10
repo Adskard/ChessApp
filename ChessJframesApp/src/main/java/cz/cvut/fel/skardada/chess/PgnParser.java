@@ -11,24 +11,98 @@ package cz.cvut.fel.skardada.chess;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
 import java.util.logging.*;
 public class PgnParser {
     private static final Logger logger = Logger.getLogger(PgnParser.class.getName());
     
-    private Game parse(){
-        return null;
+    
+    public static String parsePlayerName(PlayerColors color, String pathToSave) throws FileNotFoundException, Exception{
+        File savedGame = new File(pathToSave);
+        Scanner input = new Scanner(savedGame);
+        //2 for now can be changed in future iterations based on style
+        String searchedColor = color.toString().substring(0,1).toUpperCase() + color.toString().substring(1);
+        while(input.hasNextLine()){
+            String line = input.nextLine();
+            
+            //searching throught tags - tags always start with char "["
+            if (line.contains(searchedColor)) {
+                int offset = line.indexOf("\"") + 1;
+                int endOffset = line.lastIndexOf("\"");
+                return line.substring(offset, endOffset);
+            }
+        }
+        throw new Exception("Color: " + color + " not present in this save:" + pathToSave);
     }
     
-    public Game parseFromFile(String path){
-        
-        return parse();
-    }
+    public static long[] parseTime(String playerName, String pathToSave) throws FileNotFoundException{
+        File savedGame = new File(pathToSave);
+        Scanner input = new Scanner(savedGame);
+        long[] timeParts = new long[2];
+        while(input.hasNextLine()){
+            String line = input.nextLine();
+            
+            //searching throught tags - tags always start with char "["
+            if (line.startsWith("[" + playerName)) {
+                String[] parts = line.split("\"");
+                timeParts[0] = Long.parseLong(parts[1].strip());
+                timeParts[1] = Long.parseLong(parts[3].strip());
+                return timeParts;
+            }
+        }
+        // if time is not specified get unlimited time!
+        return new long[] {Long.MAX_VALUE, Long.MAX_VALUE};
+    } 
     
-    public void saveGameAsPgn(String path){
+    
+    public static String[] getIndividualMoves(String pathToSave) throws FileNotFoundException, Exception{
+        File savedGame = new File(pathToSave);
+        Scanner input = new Scanner(savedGame);
+        String gameNotation = "";
+        boolean startFound = false;
+        boolean ignoreComment = false;
+        while(input.hasNext()){
+            String token = input.next();
+            if (token.startsWith("{") || ignoreComment) {
+                ignoreComment = true;
+                if(token.endsWith("}")){
+                    ignoreComment = false;
+                }
+                continue;
+            }
+            if(token.equals("1-0") || token.equals("0-1") || token.equals("1/2-1/2")){
+                continue;
+            }
+            if(token.startsWith("1.") || startFound){
+                startFound = true;
+                gameNotation += token;
+                gameNotation += " ";
+            }
+        }
+        if (!startFound) {
+            throw new Exception("Pgn parse Error: first turn not found");
+        }
         
+        //delete unnecessary 1. and 2. at the move beginning
+        String[] movesWithTurns = gameNotation.split(" ");
+        ArrayList<String> movesWithoutTurns = new ArrayList<>();
+        for (int i = 0; i < movesWithTurns.length; i++) {
+            if((i % 2 == 1)){
+                movesWithoutTurns.add(movesWithTurns[i]);
+            }
+            else{
+                movesWithoutTurns.add(movesWithTurns[i].substring(movesWithTurns[i].indexOf(".") + 1 ));
+            }
+        }
+        String[] output = new String[movesWithoutTurns.size()];
+        output = movesWithoutTurns.toArray(output);
+        return output;
     }
     
     public static String encodeMoveToPgn(ChessPiece movedPiece, Coordinates dest, Coordinates start, Board board, boolean takes, boolean castleQ, boolean castleK, boolean promotion){
@@ -120,7 +194,7 @@ public class PgnParser {
         ArrayList<String> gameNotation = game.getGameBoard().getHistory().getMovesInPgn();
         for (int i = 0; i < gameNotation.size(); i++) {
             if(i % 2 == 0){
-                notation += (i/2 + 1) + ". ";
+                notation += (i/2 + 1) + ".";
             }
             notation += gameNotation.get(i);
             notation += " ";
@@ -131,12 +205,18 @@ public class PgnParser {
     
     public static String saveGameInProgress(Game game){
         String notation = "";
-        for (Player p : game.getPlayers()) {
-            notation +="[" + p.getName() + " \"" +  p.getClock().getRemainingTime() + "\" " +"\"" + p.getClock().getIncrement() +"\"]" +System.lineSeparator();
-        }
+        //notation for custom game loading
+        notation += "[Style \"" + game.getStyle().getName() + "\"]" + System.lineSeparator();
+        
+        //saving players
         notation += "[Round \"" + game.getGameBoard().getHistory().getTurn() + "\"]" + System.lineSeparator();
         for (Player p : game.getPlayers()) {
             notation +="[" + p.getColor().toString().substring(0,1).toUpperCase() + p.getColor().toString().substring(1) + " \"" + p.getName() +  "\"]" + System.lineSeparator();
+        }
+        
+        //saving times for players
+        for (Player p : game.getPlayers()) {
+            notation +="[" + p.getName() + " \"" +  p.getClock().getRemainingTime() + "\" " +"\"" + p.getClock().getIncrement() +"\"]" +System.lineSeparator();
         }
         
         //game
@@ -144,7 +224,7 @@ public class PgnParser {
         ArrayList<String> gameNotation = game.getGameBoard().getHistory().getMovesInPgn();
         for (int i = 0; i < gameNotation.size(); i++) {
             if(i % 2 == 0){
-                notation += (i/2 + 1) + ". ";
+                notation += (i/2 + 1) + ".";
             }
             notation += gameNotation.get(i);
             notation += " ";
@@ -152,13 +232,37 @@ public class PgnParser {
         
         return notation;
     }
-    
 
+    public static String isThisMoveAPromotion(String move){
+        if (move.contains("=")) {
+            return move.substring(move.indexOf("=") + 1, move.indexOf("=") + 2);
+        }
+        return null;
+    }
     
-    private static TurnHistory convertPgnToTurnHistory(String pgn){
-        TurnHistory history = new TurnHistory();
-        
-        return history;
+    public static boolean isThisMoveAQueenCastle(String move){
+        return move.equals("O-O-O");
+    }
+    
+    public static boolean isThisMoveAKingCastle(String move){
+        return move.equals("O-O");
+    }
+    
+    public static String parseMovedPiece(String move){
+        String pieceName = findPieceForPgnNotation(move);
+        if(pieceName.equals("")){
+            pieceName = "Pawn";
+        }
+        return pieceName;
+    }
+    
+    public static Coordinates getDestination(String move) throws Exception{
+        for (int i = move.length() - 1; i > 0; i--) {
+            if (Character.isDigit(move.charAt(i))) {
+                return new Coordinates(move.substring(i-1,i+1));
+            }
+        }
+        throw new Exception("Move parse error: destination not found for move: " + move);
     }
     
     public static void savePgnGameToFile(String path, Game game){
@@ -185,8 +289,8 @@ public class PgnParser {
         }
     }
     
-    public static String findPgnNotationForPiece(String pieceNameOrg){
-        String pieceName = pieceNameOrg.toLowerCase();
+    public static String findPgnNotationForPiece(String move){
+        String pieceName = move.toLowerCase();
         if(pieceName.contains("bishop")){
             return "B";
         }
@@ -204,4 +308,24 @@ public class PgnParser {
         }
         return "";
     }
+    
+    public static String findPieceForPgnNotation(String pgn){
+        if(pgn.startsWith("B")){
+            return "Bishop";
+        }
+        if(pgn.startsWith("N")){
+            return "Knight";
+        }
+        if(pgn.startsWith("R")){
+            return "Rook";
+        }
+        if(pgn.startsWith("Q")){
+            return "Queen";
+        }
+        if(pgn.startsWith("K")){
+            return "King";
+        }
+        return "";
+    }
+        
 }

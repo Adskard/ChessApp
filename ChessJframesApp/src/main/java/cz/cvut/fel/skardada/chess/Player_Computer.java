@@ -20,6 +20,7 @@ public class Player_Computer extends Player{
     }
 
   
+    @Override
     public void makeMove(Board currentBoard){
         System.out.println("making move");
         //no available pieces to play
