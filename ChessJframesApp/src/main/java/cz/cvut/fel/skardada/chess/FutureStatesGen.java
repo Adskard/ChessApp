@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
 
 import java.util.ArrayList;
@@ -10,12 +6,20 @@ import java.util.logging.*;
 
 
 /**
- *
+ * FutureStatesGen is a static class (all methods are static) that is used to calculate chess piece movement on a given board,
+ * based on current and future states of the game (checks for checks, options for casteling, en passant).
+ * These available moves both normal and special are returned to caller.
  * @author Adam Škarda
  */
 public class FutureStatesGen {
-    private static Logger logger = Logger.getLogger(ChessController.class.getName());
+    private static final Logger logger = Logger.getLogger(ChessController.class.getName());
  
+    /**
+     * Goes through all pieces on given board and checks if they can attack the king position
+     * @param board current state of the board
+     * @param king king under attack
+     * @return returns true if king is under attack from opponent pieces, else returns false
+     */
     public static boolean isChecked(Board board, ChessPiece king){
         ChessPiece[][] pieces = board.getBoard();
         for(ChessPiece[] row : pieces){
@@ -42,6 +46,17 @@ public class FutureStatesGen {
         return false;
     }
     
+    /**
+     * Calculates legal moves for a given piece and board state.
+     * Legal moves are a subset of available moves such that they do not result in
+     * the king of same color being checked.
+     * This distinction is checked by making every available move and eliminating those that
+     * result in same color king being in check.
+     * @see FutureStatesGen#calculateAvailableMoves(cz.cvut.fel.skardada.chess.Board, cz.cvut.fel.skardada.chess.ChessPiece) 
+     * @param board current state of the board
+     * @param piece piece for which the legal moves are calculated
+     * @return returns ArrayList of Coordinates, which are legal destinations for a given piece
+     */
     public static ArrayList<Coordinates> calculateLegalMoves(Board board, ChessPiece piece){
         ArrayList<Coordinates> legalMoves = new ArrayList();
         
@@ -92,6 +107,15 @@ public class FutureStatesGen {
         return legalMoves;
     }
     
+    /**
+     * Calculates all available moves for a given ChessPiece and board.
+     * Available moves are moves that are genereted from ChessPiece moveset and
+     * dont conflict with board boundries or chessPiece skipping (going through chess pieces
+     * to their other side)
+     * @param board current state of the board
+     * @param piece ChessPiece whose available moves are calculated
+     * @return returns ArrayList of Coordinates, which indicate available destinations for given ChessPiece
+     */
     public static ArrayList<Coordinates> calculateAvailableMoves(Board board, ChessPiece piece){
         ArrayList<Coordinates> availableMoves = new ArrayList();
         
@@ -149,7 +173,13 @@ public class FutureStatesGen {
         return availableMoves;
     }
     
-    
+    /**
+     * Check if special move en passant can be played for a given board state a ChessPiece
+     * @param board current state of the board
+     * @param pawn Pawn that wants to en passant
+     * @return returns destination coordinates of the given pawn, if en passant is available, 
+     * if enpassant is not available returns null
+     */
     public static Coordinates checkEnPassant(Board board, ChessPiecePawn pawn){
         
         ChessPiece lastPlayedPawn;
@@ -180,8 +210,15 @@ public class FutureStatesGen {
         return null;
     }
     
+    /**
+     * Check if given king can castle
+     * @param board current state of the board
+     * @param king king that wants to castle
+     * @return returns ArrayList of king destination coordinates after casteling if casteling is available,
+     * this ArrayList is empty is casteling is not possible
+     */
     public static ArrayList<Coordinates> checkCastle(Board board, ChessPieceKing king){
-        //STUPID GENERAL IMPLEMENTATION RETURN ARRAYLIST<COORDINATES>
+        //STUPID GENERAL IMPLEMENTATION
         ArrayList<Coordinates> destinationSquares = new ArrayList();
         
         //if king has been moved
@@ -193,7 +230,8 @@ public class FutureStatesGen {
         ArrayList<ChessPiece> sameColorRooks = new ArrayList();
         for (ChessPiece[] row : board.getBoard()) {
             for(ChessPiece piece : row){
-                if(piece != null && piece.getColor() == king.getColor() && piece.getName().contains("Rook")){
+                if(piece != null && piece.getColor() == king.getColor() && piece.getName().contains("Rook")
+                    && piece.getPosition().getX() == king.getPosition().getX()){
                     sameColorRooks.add(piece);
                 }
             }
@@ -261,6 +299,12 @@ public class FutureStatesGen {
         return destinationSquares;
     }
     
+    /**
+     * Check if pawn can be promoted
+     * @param board current state of the board
+     * @param pawn pawn that wants to be promoted
+     * @return returns true if pawn can be promoted, else returns false
+     */
     public static boolean checkPromotion(Board board, ChessPiecePawn pawn){
         if(pawn.getPosition().getX() == board.getSize() || pawn.getPosition().getX() == 0){
             return true;
@@ -268,6 +312,12 @@ public class FutureStatesGen {
         return false;
     }
     
+    /**
+     * Check if pawn can be moved by two places (pawn movement from initial position)
+     * @param board current state of the board
+     * @param pawn pawn that wants to be moved by two places
+     * @return returns destination Coordinates if pawn can move by two places, else returns null
+     */
     private static Coordinates checkDoublePawn(Board board, ChessPiecePawn pawn){
         //The pawn has moved - ergo cant do this special movement
         if(board.getHistory().getPiecesMoved().contains(pawn)){
@@ -281,6 +331,13 @@ public class FutureStatesGen {
             Coordinates doubleMove = pawn.getMoveSet().getMoveVectors()[0].getProduct(pawn.getMoveSet().getMoveDistance()+1);
             Coordinates dest = start.getSum(doubleMove);
             Coordinates inBetween = start.getSum(normalMove);
+            //out of bounds
+            if (inBetween.getX() >= board.getSize() || inBetween.getY() >= board.getSize() || inBetween.getX() < 0 || inBetween.getY() < 0) {
+                return null;
+            }
+            if (dest.getX() >= board.getSize() || dest.getY() >= board.getSize() || dest.getX() < 0 || dest.getY() < 0) {
+                return null;
+            }
             //destination square is empty
             if(board.getBoard()[dest.getX()][dest.getY()] == null && board.getBoard()[inBetween.getX()][inBetween.getY()] == null){
                 return dest;
@@ -289,6 +346,14 @@ public class FutureStatesGen {
         return null;
     }
     
+    
+    /**
+     * Check if pawn can take opponent piece
+     * @param board current state of the board
+     * @param pawn pawn that wants to take
+     * @return returns ArrayList of destination coordinates if pawn can take enemy piece,
+     * if the pawn has no available attacks the ArrayList is empty
+     */
     private static ArrayList<Coordinates> checkPawnTakes(Board board, ChessPiecePawn pawn){
         ArrayList<Coordinates> result = new ArrayList();
         Coordinates start = pawn.getPosition();
@@ -312,6 +377,15 @@ public class FutureStatesGen {
         return result;
     }
     
+    /**
+     * Creates a possible future board state from current board state and available moves
+     * This is used for calculating legal moves
+     * @see FutureStatesGen#calculateLegalMoves(cz.cvut.fel.skardada.chess.Board, cz.cvut.fel.skardada.chess.ChessPiece) 
+     * @param board current state of the board
+     * @param source starting postion of a move (where the moved ChessPiece is prior to movement) 
+     * @param dest  destination square for the chessPiece from source
+     * @return returns Board, where a given move was made
+     */
     private static Board getFutureBoardState(Board board, Coordinates source, Coordinates dest){
         //clone the board
         Board futureState = new Board(board);

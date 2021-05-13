@@ -1,25 +1,33 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
 
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 /**
- *
+ * PlayerComputer is an implementation of abstract class Player and is the main class for this computer algorithm decision making.
+ * For now decisions are pseudo-random.
  * @author Adam Škarda
  */
 public class Player_Computer extends Player{
     
-
+    /**
+     *
+     * @param name Computer player name
+     * @param color Computer player color
+     * @param ownPieces Computer player pieces, ChessPieces of the same color - can be moved by this Player
+     * @param clock Computer player time controll
+     */
     public Player_Computer(String name, PlayerColors color, ArrayList<ChessPiece> ownPieces, ChessClock clock) {
         super(name, color, ownPieces, clock);
     }
 
-  
+    /**
+     * Uses Board.movePiece() method to make direct changes to the game board.
+     * Change being this player move.
+     * @see Board#movePiece(cz.cvut.fel.skardada.chess.Coordinates, cz.cvut.fel.skardada.chess.Coordinates)
+     * @param currentBoard current state of the game board
+     * 
+     */
     @Override
     public void makeMove(Board currentBoard){
         System.out.println("making move");
@@ -61,15 +69,28 @@ public class Player_Computer extends Player{
         //indicate end of turn to the controller
         this.setFinishedTurn(true);
     }
-    
+    /**
+     * Method for choosing a random ChessPiece
+     * @return random ChessPiece from OwnPieces
+     */
     private ChessPiece getRandomPiece(){
         return this.getOwnPieces().get(ThreadLocalRandom.current().nextInt(0, this.getOwnPieces().size()));
     }
     
+    /**
+     * Method for choosing a random unique ChessPiece for promotion
+     * @param board current board with list of unique ChessPieces
+     * @return random ChessPiece from Unique pieces of Board class
+     */
     private ChessPiece getRandomUnique(Board board){
         return board.getUniquePieces().get(ThreadLocalRandom.current().nextInt(0, board.getUniquePieces().size())); 
     }
     
+    /**
+     * Method for choosing random destination for a given piece
+     * @param piece A chess piece that is to be moved
+     * @return random Coordinate of 
+     */
     private Coordinates getRandomDest(ChessPiece piece){
         return piece.getLegalMoves().get(ThreadLocalRandom.current().nextInt(0, piece.getLegalMoves().size()));
     }

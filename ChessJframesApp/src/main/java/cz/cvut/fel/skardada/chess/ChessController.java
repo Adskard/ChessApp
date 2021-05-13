@@ -1,17 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.logging.*;
 /**
- *
+ * ChessController is the controller and main class of this aplication it initializes the view and maps its outputs and inputs on models outputs/inputs.
+ * The whole game cycle (setting up the game, players taking turns) is implemented through this class.
+ * Its job is also to save/load import and export games in PGN format and almost every other capability this app has.
  * @author Adam Škarda
  */
 public class ChessController implements Runnable{
@@ -23,10 +20,17 @@ public class ChessController implements Runnable{
     private PlayerColors startingPlayer;
     private String loadedPgnPath;
     
+    /**
+     * Contsructor for thread and setting logger hadnler
+     */
     public ChessController(){
         logger.addHandler(new ConsoleHandler());
     }
     
+    /**
+     * main method that initializes the main controll thread
+     * @param args
+     */
     public static void main(String[] args){
         //initialize main controller thread
         ChessController control = new ChessController();
@@ -34,6 +38,11 @@ public class ChessController implements Runnable{
         mainThread.start();
     }
     
+    /**
+     * Override run for working Runnable implementation
+     * Consits of while loop that waits for mainView user input.
+     * This way aplication can only end if it is exited by window termination.
+     */
     @Override
     public void run(){
         //Escape option of this while loop is closing the view window
@@ -52,24 +61,27 @@ public class ChessController implements Runnable{
                       this.wait(100);  
                     }
                     catch(Exception E){
-                        System.err.println(E.getMessage());
+                        logger.log(Level.SEVERE, E.getMessage());
                     }
                 }
             }
             
             //for the next game
             mainView.setReady(false);
+            
+            //manual piece setup before game
             if(mainView.isManualSetup()){
                 mainView.setManualSetup(false);
                 this.manualSetUp();
                 logger.log(Level.INFO, "Manual set up selected");
             }
-            
+            //normal game start
             if(mainView.isNormalStart()){
                 mainView.setNormalStart(false);
                 this.normalStart();
                 logger.log(Level.INFO, "Normal start selected");
             }
+            //when loading the game
             if (mainView.isLoadGame()) {
                 mainView.setLoadGame(false);
                 String path = mainView.showOpenDialog();
@@ -82,6 +94,8 @@ public class ChessController implements Runnable{
                     this.game = null;
                 }
             }
+            
+            //viewing pgn game
             if(mainView.isPgnView()){
                 mainView.setPgnView(false);
                 String path = mainView.showOpenDialog();
@@ -97,15 +111,19 @@ public class ChessController implements Runnable{
         }
     }
     
-    private Game createFakeGameForView(String pgnPath) throws Exception{
+    /**
+     * Creates game based on information from file specified by pgnPath
+     * This game is unplayable as the player clocka are null.
+     * But can be used for viewing board states and history.
+     * @param pgnPath path to the simulated game
+     * @return game based on pgn notation in loaded pgn file
+     * @throws Exception bubbled up from PgnParser#parsePlayerName()
+     * @throws URISyntaxException exception from loading style 
+     */
+    private Game createFakeGameForView(String pgnPath) throws Exception, URISyntaxException{
         String stylePath = "";
         //change this to change chessStyle, may not work, not fully implemented
-        try {
-            stylePath = ChessController.class.getResource("/style_standard.ser").toURI().getPath();
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(ChessController.class.getName()).log(Level.SEVERE, "Could not find game style file", ex);
-            System.exit(-1);
-        }
+        stylePath = ChessController.class.getResource("/style_standard.ser").toURI().getPath();
         ChessStyle style = this.loadGameStyle(stylePath); 
         
         //TODO init for n players
@@ -127,15 +145,20 @@ public class ChessController implements Runnable{
         return new Game(style, players);
     }
     
+    /**
+     * Loads Game form file specified by pathToSave.
+     * This game is recreated and assigned to this.game.
+     * After the game is created it runs normalStart()
+     * 
+     * @param pgnPath path to the simulated game
+     * @return game based on pgn notation in loaded pgn file
+     * @throws Exception bubbled up from PgnParser#parsePlayerName()
+     * @throws URISyntaxException exception from loading style 
+     */
     private void loadGameStart(String pathToSave) throws FileNotFoundException, Exception{
         String stylePath = "";
         //change this to change chessStyle, may not work, not fully implemented
-        try {
-            stylePath = ChessController.class.getResource("/style_standard.ser").toURI().getPath();
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(ChessController.class.getName()).log(Level.SEVERE, "Could not find game style file", ex);
-            System.exit(-1);
-        }
+        stylePath = ChessController.class.getResource("/style_standard.ser").toURI().getPath();
         ChessStyle style = this.loadGameStyle(stylePath); 
         
         //TODO init for n players
@@ -162,12 +185,23 @@ public class ChessController implements Runnable{
         this.normalStart();
     }
     
+    /**
+     * Advances game based on turnTaken 
+     * @param turnsTaken pgn turns (without turn notation "1."...) eg. d5, Bxb4...
+     * @return recreated game state based on turnsTaken
+     * @throws Exception bubbled up from createFakeGameForView() 
+     */
     public Game createFakeGameStateForView(String[] turnsTaken) throws Exception{
         Game fake = createFakeGameForView(loadedPgnPath);
         takeTurns(turnsTaken, fake);
         return fake;
     }
     
+    /**
+     * Facilitates pgn viewing by recreating loaded game and displaying by initializing boardview
+     * @param pgnPath path to pgn file
+     * @throws bubbled up from several sources
+     */
     private void viewPgn(String pgnPath) throws Exception{
         this.game = createFakeGameForView(pgnPath);
         String [] turnsTaken = PgnParser.getIndividualMoves(pgnPath);
@@ -176,16 +210,22 @@ public class ChessController implements Runnable{
         synchronized(this){
             while(!boardView.ready){
                 try{
-                  Thread.sleep(10);  
+                  this.wait(10);  
                 }
-                catch(Exception E){
+                catch(InterruptedException E){
                     System.err.println(E.getMessage());
                 }
             }
         }
+        this.boardView.addResultText(PgnParser.parseGameResult(pgnPath));
     }
     
-    
+    /**
+     * Advances the playedGame by pgn moves noted in turns
+     * @param turns turns in String pgn (without turn notation eg. "2.") that are to be taken
+     * @param playedGame game on where the turns should be taken
+     * @throws  Exception bubbled up from Board#movePiece()
+     */
     public void takeTurns(String[] turns, Game playedGame) throws Exception{
         Board board = playedGame.getGameBoard();
         int currentPlayerIndex = 0;
@@ -206,6 +246,9 @@ public class ChessController implements Runnable{
         startingPlayer = playedGame.getPlayers().get(currentPlayerIndex % 2).getColor();
     }
     
+    /**
+     * Facilitates manual set up
+     */
     private void manualSetUp(){
         this.mainView.setEnabled(false);
         normalGameSetup();
@@ -215,9 +258,9 @@ public class ChessController implements Runnable{
         synchronized(this){
             while(!boardView.ready){
                 try{
-                  Thread.sleep(10);  
+                  this.wait(10);  
                 }
-                catch(Exception E){
+                catch(InterruptedException E){
                     System.err.println(E.getMessage());
                 }
             }
@@ -227,7 +270,7 @@ public class ChessController implements Runnable{
             try{
                 Thread.sleep(10);  
             }
-            catch(Exception E){
+            catch(InterruptedException E){
                 System.err.println(E.getMessage());
             }
         }
@@ -236,6 +279,10 @@ public class ChessController implements Runnable{
         this.mainView.setEnabled(true);
     }
     
+    /**
+     * Starts the game by invoking boardView and calling startTheGame()
+     * if game is not prepared calls normalGameSetup() for game initialization
+     */
     private void normalStart(){
         //Set up the game model
         if (this.game == null) {
@@ -255,7 +302,7 @@ public class ChessController implements Runnable{
                 try{
                   this.wait(10);  
                 }
-                catch(Exception E){
+                catch(InterruptedException E){
                     System.err.println(E.getMessage());
                 }
             }
@@ -265,6 +312,9 @@ public class ChessController implements Runnable{
         this.startTheGame(); 
     }
     
+    /**
+     * Sets up game based on information from mainView.
+     */
     private void normalGameSetup(){
         String stylePath = "";
         //change this to change chessStyle
@@ -318,6 +368,9 @@ public class ChessController implements Runnable{
         this.game = new Game(style, players);
     }
     
+    /**
+     * Game cycle that support game-play.
+     */
     private void startTheGame(){
         //game is played until winner is decided
         Player winner = null;
@@ -402,7 +455,7 @@ public class ChessController implements Runnable{
                     try{
                        this.wait(10); 
                     }
-                    catch(Exception e){
+                    catch(InterruptedException e){
                         System.err.println(e.getMessage() + " " + Thread.currentThread().getName());
                     }
                 } 
@@ -413,6 +466,11 @@ public class ChessController implements Runnable{
         }
     } 
     
+    /**
+     * @param color color of chosen player
+     * @param style style from where pieces are agregated
+     * @return returns ArrayList of ChessPieces that belong to player specified by color
+     */
     private ArrayList getPlayerPieces(PlayerColors color, ChessStyle style){
         ArrayList<ChessPiece> pieces = new ArrayList();
         for(ChessPiece[] row : style.getBoardArrangement()){
@@ -425,6 +483,9 @@ public class ChessController implements Runnable{
         return pieces;
     }
     
+    /**
+     * @return retruns string that represents current state of the game board
+     */
     private String printBoard(){
         String gameState = "";
         gameState += "[" + System.lineSeparator();
@@ -446,7 +507,11 @@ public class ChessController implements Runnable{
         return gameState;
     }
     
-
+    /**
+     * loads serialized Style from file based on given path
+     * @param stylePath path to serialized style file - should be in resources
+     * 
+     */
     private ChessStyle loadGameStyle(String stylePath){
         ChessStyle style = null;
         try{
@@ -457,23 +522,29 @@ public class ChessController implements Runnable{
             file.close();
         }
         catch(IOException ex){
-            System.err.print("Could not read resource " + ex.getMessage());
+            logger.log(Level.SEVERE, "Could not read resource {0} ", ex.getMessage());
             return null;
         }
         catch(ClassNotFoundException ex){
-            System.err.print("Could not find class " + ex.getMessage());
+            logger.log(Level.SEVERE, "Could not find serialized class {0} ", ex.getMessage());
             return null;
         }
         return style;
     }
     
-    
+    /**
+     * Shows saveDialog where user chooses save location for exported Pgn game.
+     * The game is then encoded to pgn and saved in save location.
+     * @param winner color of player who won the game can insert null for a draw
+     */
     private void exportPgnGame(PlayerColors winner){
         String path = boardView.showSaveDialog();
         PgnParser.exportPgnGameToFile(path, game, winner);
     }
     
-    
+    /**
+     * Sets main menu visible and disposes of boardView and game
+     */
     public void exitBoardToMain(){
         this.mainView.setVisible(true);
         this.game = null;

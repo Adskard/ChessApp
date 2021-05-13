@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess.ChessPieces;
 
 import cz.cvut.fel.skardada.chess.ChessPieceImpl;
@@ -10,14 +6,19 @@ import cz.cvut.fel.skardada.chess.Coordinates;
 import cz.cvut.fel.skardada.chess.MoveSet;
 import cz.cvut.fel.skardada.chess.PlayerColors;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 import org.apache.commons.cli.*;
+
 /**
- *
+ * Serializes ChessPieceImpl for given inputs and saves them into resources
  * @author Adam Škarda
  */
 public class ChessPieceMaker {
+
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args){
         //variables for chess piece creation
         ChessPieceImpl piece;

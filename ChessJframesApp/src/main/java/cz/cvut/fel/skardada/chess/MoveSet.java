@@ -1,12 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
 
 /**
- *
+ * MoveSet is a class that describes the way a chess piece can move on the board (barring any special moves, such as casteling).
+ * It comprises of two parts: a set of vectors which give a direction of the movement 
+ * and distance which describes how many squares in a given direction can the piece move - it is an upper limit.
  * @author Adam Škarda
  */
 public class MoveSet implements java.io.Serializable{
@@ -23,10 +21,18 @@ public class MoveSet implements java.io.Serializable{
         this.moveDistance = distance;
     }
 
+    /**
+     *
+     * @return returns move vectors as array of Coordinates
+     */
     public Coordinates[] getMoveVectors() {
         return moveVectors;
     }
 
+    /**
+     * 
+     * @return returns moveDistance as integer
+     */
     public int getMoveDistance() {
         return moveDistance;
     }

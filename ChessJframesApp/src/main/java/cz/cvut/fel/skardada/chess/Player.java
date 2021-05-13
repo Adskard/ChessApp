@@ -1,25 +1,29 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
 
 import java.util.ArrayList;
 
 /**
- *
+ * Player is an abstract class that defines a generic player of the game.
+ * That means their color, clock, availablePieces. Its main task is to take a turn (make a decision on what to do on a given turn).
  * @author Adam Škarda
  */
 public abstract class Player {
     private final PlayerColors color;
     private final ArrayList<ChessPiece> ownPieces;
-    private ArrayList<Coordinates> availableMoves;
-    private ChessClock clock;
+    private final ArrayList<Coordinates> availableMoves;
+    private final ChessClock clock;
     private boolean currentlyPlaying;
     private boolean finishedTurn;
-    private String name;
+    private final String name;
     
+    /**
+     *
+     * @param name Player name 
+     * @param color Player color
+     * @param ownPieces Pieces with the same color as the player, are owned by the player
+     * @param clock Player time control
+     */
     public Player(String name, PlayerColors color, ArrayList<ChessPiece> ownPieces, ChessClock clock) {
         this.color = color;
         this.ownPieces = ownPieces;
@@ -30,8 +34,16 @@ public abstract class Player {
         this.name = name;
     }
     
+    /**
+     * Player move on the board
+     * @param currentBoard current state of the board
+     */
     public abstract void makeMove(Board currentBoard);
     
+    /**
+     * Checking if the player lost/ is checkmated
+     * @return true if player is checked and has no available moves or is out of time
+     */
     public boolean isMated(){
         if((this.isChecked() && this.availableMoves.isEmpty()) || this.clock.getRemainingTime() <= 0){
             return true;
@@ -39,6 +51,10 @@ public abstract class Player {
         return false;
     }
     
+    /**
+     * Checking conditions for a draw
+     * @return true if player has insufficient material for a checkmate
+     */
     public boolean hasInsufficientMaterial(){
         //only king remains 
         if (this.ownPieces.size() == 1) {
@@ -51,6 +67,9 @@ public abstract class Player {
         return false;
     }
     
+    /**
+     * Updates this Available moves by going through player owned pieces and agregating their legal moves
+     */
     public void updateAvailableMoves(){
         //go through all owned pieces, removed destoryed pieces and get legal moves of still alive pieces
         this.availableMoves.clear();
@@ -65,6 +84,10 @@ public abstract class Player {
         this.ownPieces.removeAll(removedPieces);
     }
     
+    /**
+     * Find checked state of players king
+     * @return true if player owns a king that is checked
+     */
     public boolean isChecked(){ 
         //find king chessPiece - ask it if its in check 
         for (ChessPiece piece : this.ownPieces) {
@@ -79,42 +102,75 @@ public abstract class Player {
         return false;
     }
 
+    /**
+     *
+     * @return boolean for finished turn
+     */
     public boolean getFinishedTurn() {
         return finishedTurn;
     }
 
+    /**
+     * Set player made move
+     * @param madeAMove new finishedTurn value
+     */
     public void setFinishedTurn(boolean madeAMove) {
         this.finishedTurn = madeAMove;
     }
 
+    /**
+     *
+     * @return gets this Player color
+     */
     public PlayerColors getColor() {
         return color;
     }
+
+    /**
+     *
+     * @return gets this player currentlyPlaying status
+     */
     public boolean isCurrentlyPlaying() {
         return currentlyPlaying;
     }
 
+    /**
+     * Set this player currentlyPlaying
+     * @param currentlyPlaying new currentlyPlaying value
+     */
     public void setCurrentlyPlaying(boolean currentlyPlaying) {
         this.currentlyPlaying = currentlyPlaying;
     }
 
+    /**
+     *
+     * @return get this player clock
+     */
     public ChessClock getChessClock(){
         return clock;
     }
 
+    /**
+     *
+     * @return get this player pieces
+     */
     public ArrayList<ChessPiece> getOwnPieces() {
         return ownPieces;
     }
 
+    /**
+     *
+     * @return gets this player name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return gets ArrayList of this Player availableMoves
+     */
     public ArrayList<Coordinates> getAvailableMoves() {
         return availableMoves;
-    }
-
-    public ChessClock getClock() {
-        return clock;
     }
 }

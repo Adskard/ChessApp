@@ -1,21 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *
+ * Test contructors of ChessPiecePawn class
  * @author Adam Škarda
  */
 public class ChessPiecePawnTest {
 
     /**
-     * Test of doublePass method, of class ChessPiecePawn.
+     * Test of constructor creating white pawn
      */
     @Test
     public void testConstructor_whitePawn_vector10Distance1(){
@@ -33,7 +29,7 @@ public class ChessPiecePawnTest {
         assertEquals(expDistance, pawn.getMoveSet().getMoveDistance());
     }
     /**
-     * Test of doublePass method, of class ChessPiecePawn.
+     * Test of constructor creating black pawn
      */
      @Test
     public void testConstructor_blackPawn_vectorNeg10Distnace1(){

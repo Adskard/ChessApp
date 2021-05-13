@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
 
 import javax.swing.JFileChooser;
 
 /**
- *
+ * MainView is a class of view and is a java.swing window application. It displays game options for game configuration.
  * @author Adam Škarda
  */
 public class MainView extends javax.swing.JFrame {
@@ -30,7 +26,8 @@ public class MainView extends javax.swing.JFrame {
     private boolean manualSetup = false;
     private boolean pgnView = false;
     private boolean loadGame = false;
-    private JFileChooser saveDialog;
+    private final JFileChooser saveDialog;
+
     /**
      * Creates new form mainView
      */
@@ -38,117 +35,105 @@ public class MainView extends javax.swing.JFrame {
         initComponents();
         this.saveDialog = new JFileChooser();
     }
-    
-    private boolean validateInputs(){
+
+    private boolean validateInputs() {
         boolean noErrors = true;
 
         //TODO sort THIS code to validate functions of elements
-        
         //set Player Names
         //Player 1
         String errorPrompt = "Give me your Name!";
-        if(p1NameChooser.getText() == null || p1NameChooser.getText().equals("") || p1NameChooser.getText().equals(errorPrompt)){
+        if (p1NameChooser.getText() == null || p1NameChooser.getText().equals("") || p1NameChooser.getText().equals(errorPrompt)) {
             p1NameChooser.setText(errorPrompt);
             noErrors = false;
+        } else {
+            this.p1name = p1NameChooser.getText();
         }
-        else{
-           this.p1name = p1NameChooser.getText(); 
-        }
-        
+
         //Player 2
-        if(p2NameChooser.getText() == null || p2NameChooser.getText().equals("") || p2NameChooser.getText().equals(errorPrompt)){
+        if (p2NameChooser.getText() == null || p2NameChooser.getText().equals("") || p2NameChooser.getText().equals(errorPrompt)) {
             p2NameChooser.setText(errorPrompt);
             noErrors = false;
-        }
-        else{
+        } else {
             this.p2name = p2NameChooser.getText();
         }
-        
-        
+
         //set Player Types
-        if(p1TypeChooser.getSelectedItem() == p2TypeChooser.getSelectedItem() && p1TypeChooser.getSelectedItem() == PossibleOpponents.internet){
+        if (p1TypeChooser.getSelectedItem() == p2TypeChooser.getSelectedItem() && p1TypeChooser.getSelectedItem() == PossibleOpponents.internet) {
             noErrors = false;
-        }
-        else{
+        } else {
             this.p1Type = (PossibleOpponents) p1TypeChooser.getSelectedItem();
-            this.p2Type = (PossibleOpponents) p2TypeChooser.getSelectedItem(); 
+            this.p2Type = (PossibleOpponents) p2TypeChooser.getSelectedItem();
         }
-        
+
         //set Player Colors
-        if(p1Color.isSelected()){
+        if (p1Color.isSelected()) {
             p1color = PlayerColors.white;
             p2color = PlayerColors.black;
-        }
-        else{
+        } else {
             p1color = PlayerColors.black;
             p2color = PlayerColors.white;
         }
-        
+
         // Player 1
         int timeStringPartNumber = 3;
         String timeErrorMsg = "hh:mm:ss";
-        if(p1TimeChooser.getText().equals("")){
+        if (p1TimeChooser.getText().equals("")) {
             p1TimeChooser.setText(timeErrorMsg);
             noErrors = false;
         }
         String[] timeInfo = p1TimeChooser.getText().split(":");
-        if(timeInfo.length != timeStringPartNumber){
+        if (timeInfo.length != timeStringPartNumber) {
             p1TimeChooser.setText(timeErrorMsg);
             noErrors = false;
-        }
-        else{
-            for(String info : timeInfo){
-                try{
+        } else {
+            for (String info : timeInfo) {
+                try {
                     Integer.parseInt(info);
-                }
-                catch(NumberFormatException ex){
+                } catch (NumberFormatException ex) {
                     p1TimeChooser.setText(timeErrorMsg);
                     noErrors = false;
                 }
             }
             p1time = p1TimeChooser.getText();
         }
-        
+
         // Player 2
-        if(p2TimeChooser.getText().equals("")){
+        if (p2TimeChooser.getText().equals("")) {
             p2TimeChooser.setText(timeErrorMsg);
             noErrors = false;
         }
         timeInfo = p2TimeChooser.getText().split(":");
-        if(timeInfo.length != timeStringPartNumber){
+        if (timeInfo.length != timeStringPartNumber) {
             p2TimeChooser.setText(timeErrorMsg);
             noErrors = false;
-        }
-        else{
-            for(String info : timeInfo){
-                try{
+        } else {
+            for (String info : timeInfo) {
+                try {
                     Integer.parseInt(info);
-                }
-                catch(NumberFormatException ex){
+                } catch (NumberFormatException ex) {
                     p2TimeChooser.setText(timeErrorMsg);
                     noErrors = false;
                 }
             }
             p2time = p2TimeChooser.getText();
         }
-        
+
         //set Player increment
         //Player 1
-        if(p1IncrementChooser.getText().equals("")){
+        if (p1IncrementChooser.getText().equals("")) {
             p1IncrementChooser.setText(timeErrorMsg);
             noErrors = false;
         }
         String[] incrementInfo = p1IncrementChooser.getText().split(":");
-        if(incrementInfo.length != timeStringPartNumber){
+        if (incrementInfo.length != timeStringPartNumber) {
             p1IncrementChooser.setText(timeErrorMsg);
             noErrors = false;
-        }
-        else{
-            for(String info : timeInfo){
-                try{
+        } else {
+            for (String info : timeInfo) {
+                try {
                     Integer.parseInt(info);
-                }
-                catch(NumberFormatException ex){
+                } catch (NumberFormatException ex) {
                     p1IncrementChooser.setText(timeErrorMsg);
                     noErrors = false;
                 }
@@ -156,21 +141,19 @@ public class MainView extends javax.swing.JFrame {
             p1incrementTime = p1IncrementChooser.getText();
         }
         //Player 2
-        if(p2IncrementChooser.getText().equals("")){
+        if (p2IncrementChooser.getText().equals("")) {
             p2IncrementChooser.setText(timeErrorMsg);
             noErrors = false;
         }
         incrementInfo = p2IncrementChooser.getText().split(":");
-        if(incrementInfo.length != timeStringPartNumber){
+        if (incrementInfo.length != timeStringPartNumber) {
             p2IncrementChooser.setText(timeErrorMsg);
             noErrors = false;
-        }
-        else{
-            for(String info : timeInfo){
-                try{
+        } else {
+            for (String info : timeInfo) {
+                try {
                     Integer.parseInt(info);
-                }
-                catch(NumberFormatException ex){
+                } catch (NumberFormatException ex) {
                     p2IncrementChooser.setText(timeErrorMsg);
                     noErrors = false;
                 }
@@ -421,14 +404,12 @@ public class MainView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-        
+
         //set ready flag for controller
         if (this.validateInputs()) {
-           this.ready = true; 
-           this.normalStart = true;
-        }
-        
-        else{
+            this.ready = true;
+            this.normalStart = true;
+        } else {
             this.ready = false;
         }
     }//GEN-LAST:event_startButtonActionPerformed
@@ -450,8 +431,7 @@ public class MainView extends javax.swing.JFrame {
         if (this.validateInputs()) {
             this.ready = true;
             this.manualSetup = true;
-        }
-        else{
+        } else {
             this.ready = false;
         }
     }//GEN-LAST:event_setUpGameButtonActionPerformed
@@ -466,96 +446,187 @@ public class MainView extends javax.swing.JFrame {
         this.pgnView = true;
     }//GEN-LAST:event_viewPgnButtonActionPerformed
 
+    /**
+     *
+     * @return returns save game path
+     */
     public String getSavePath() {
         return savePath;
     }
 
+    /**
+     *
+     * @return returns stylePath
+     */
     public String getStylePath() {
         return stylePath;
     }
 
+    /**
+     *
+     * @return returns player 1 time
+     */
     public String getP1time() {
         return p1time;
     }
 
+    /**
+     *
+     * @return returns normalStart flag
+     */
     public boolean isNormalStart() {
         return normalStart;
     }
 
+    /**
+     *
+     * @return returns manualSetup flag
+     */
     public boolean isManualSetup() {
         return manualSetup;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isPgnView() {
         return pgnView;
     }
 
+    /**
+     *
+     * @return returns loadGame flag
+     */
     public boolean isLoadGame() {
         return loadGame;
     }
 
-
+    /**
+     *
+     * @return returns player 2 time as string
+     */
     public String getP2time() {
         return p2time;
     }
 
+    /**
+     *
+     * @return returns player 1 name
+     */
     public String getP1name() {
         return p1name;
     }
 
+    /**
+     *
+     * @return returns player 1 increment
+     */
     public String getP1incrementTime() {
         return p1incrementTime;
     }
 
+    /**
+     *
+     * @return returns player 2 incrment
+     */
     public String getP2incrementTime() {
         return p2incrementTime;
     }
 
+    /**
+     *
+     * @return returns player 1 color
+     */
     public PlayerColors getP1color() {
         return p1color;
     }
 
+    /**
+     *
+     * @return returns player 2 color
+     */
     public PlayerColors getP2color() {
         return p2color;
     }
 
+    /**
+     * sets a flag to indicate if normal start is selected
+     * @param normalStart
+     */
     public void setNormalStart(boolean normalStart) {
         this.normalStart = normalStart;
     }
 
+    /**
+     *
+     * @param manualSetup
+     */
     public void setManualSetup(boolean manualSetup) {
         this.manualSetup = manualSetup;
     }
 
+    /**
+     * sets flag to indicate if pgn is viewed
+     * @param pgnView
+     */
     public void setPgnView(boolean pgnView) {
         this.pgnView = pgnView;
     }
 
+    /**
+     * sets load game flag to indicate if game is loaded
+     * @param loadGame 
+     */
     public void setLoadGame(boolean loadGame) {
         this.loadGame = loadGame;
     }
 
+    /**
+     *
+     * @return returns player 1 type
+     */
     public PossibleOpponents getP1Type() {
         return p1Type;
     }
 
+    /**
+     *
+     * @return returns player 2 type
+     */
     public PossibleOpponents getP2Type() {
         return p2Type;
     }
 
+    /**
+     *
+     * @return returns name of player 2
+     */
     public String getP2name() {
         return p2name;
     }
 
+    /**
+     * sets ready state
+     * @param ready 
+     */
     public void setReady(boolean ready) {
         this.ready = ready;
     }
 
+    /**
+     *
+     * @return returns ready state 
+     */
     public boolean isReady() {
         return ready;
     }
-    
-    public String showOpenDialog(){
+
+    /**
+     * opens saveDialog for user path input
+     * @return returns chosen path to file
+     */
+    public String showOpenDialog() {
         int k = saveDialog.showOpenDialog(this);
         if (k != JFileChooser.APPROVE_OPTION) {
             return "";

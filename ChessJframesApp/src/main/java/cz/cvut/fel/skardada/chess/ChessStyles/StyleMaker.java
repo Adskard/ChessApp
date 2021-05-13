@@ -1,23 +1,24 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess.ChessStyles;
 
-/**
- *
- * @author Adam Škarda
- */
+
 import cz.cvut.fel.skardada.chess.*;
 import java.io.*;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.cli.*;
+
+/**
+ * Serializes ChessStyle for given inputs and saves it into resources
+ * @author Adam Škarda
+ */
 public class StyleMaker {
 
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args){
         //varibles for style creation
         ChessStyle style = null;

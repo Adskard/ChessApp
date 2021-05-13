@@ -1,14 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
 
 import java.util.ArrayList;
 import java.util.logging.*;
 /**
- *
+ * Board is class that describes current state of the chess board. Its main purpose is to store information about the pieces in play and their position.
+ * Its methods are used to change the state of the board.
+ * That means moving the pieces already on the board, promoting them and implementing special movements (castles, en passant).
+ * These changes to the board state are recorded in TurnHistory in this class.
  * @author Adam Škarda
  */
 public class Board {
@@ -16,9 +15,14 @@ public class Board {
     private final ChessPiece[][] board; 
     private final TurnHistory history; 
     private final ArrayList<ChessPiece> uniquePieces;
-    private static Logger logger = Logger.getLogger(Board.class.getName());
+    private static final Logger logger = Logger.getLogger(Board.class.getName());
     private ArrayList<Coordinates> allCoordinates;
 
+    /**
+     * Constructor
+     * @param size size of the square board
+     * @param arrangement arrangement of pieces on the board
+     */
     public Board(int size, ChessPiece[][] arrangement) {
         this.size = size;
         this.board = arrangement;
@@ -27,7 +31,11 @@ public class Board {
         this.distributeIds();
     }
     
-    //copy constructor
+
+    /**
+     * Copy constructor
+     * @param original original board to be copied
+     */
     public Board(Board original){
         this.history = new TurnHistory(original.getHistory());
         this.size = original.getSize();
@@ -47,7 +55,6 @@ public class Board {
                 }
                 if(original.getBoard()[i][j] instanceof ChessPieceKing){
                     this.board[i][j] = new ChessPieceKing(original.getBoard()[i][j]);
-                    continue;
                 }
 
                 else
@@ -58,6 +65,10 @@ public class Board {
         } 
     }
     
+    /**
+     * Distributes unique ids to pieces on board
+     * Should be called only once during initialization
+     */
     private void distributeIds(){
         // each piece gets unique id
         int id = 0;
@@ -71,13 +82,18 @@ public class Board {
         }
     }
     
+    /**
+     * Updates available moves, checks and legal moves of pieces on the board
+     */
     public void updatePieces(){
         updateAvailableMoves();
         updateChecks();
         updateLegalMoves();
-        
     }
     
+    /**
+     * Updates available moves for every ChessPiece on the board
+     */
     public void updateAvailableMoves(){
         for(ChessPiece[] row : this.board){
             for(ChessPiece piece : row){   
@@ -88,6 +104,9 @@ public class Board {
         }
     }
     
+    /**
+     * Updates legal moves for every ChessPiece on the board
+     */
     public void updateLegalMoves(){
         for(ChessPiece[] row : this.board){
             for(ChessPiece piece : row){
@@ -98,6 +117,9 @@ public class Board {
         }
     }
     
+    /**
+     * Updates checks for every king on the board
+     */
     public void updateChecks(){
         // find the king
         for(ChessPiece[] row : this.board){
@@ -113,6 +135,13 @@ public class Board {
         }
     }
     
+    
+    /**
+     * Method for moving pieces on the board
+     * @param pgnMove move encoded in pgn 
+     * @param currentPlayer player who played the move
+     * @throws Exception bubbled up from parsing with PgnParser
+     */
     public void movePiece(String pgnMove, Player currentPlayer) throws Exception{
         this.updatePieces();
         ArrayList<ChessPiece> availablePieces = currentPlayer.getOwnPieces();
@@ -206,30 +235,12 @@ public class Board {
             }
         }
     }
-    
-    public void updateMovesToAnyCoordinate(){
-        //make list of all possible moves
-        if (allCoordinates == null) {
-            allCoordinates = new ArrayList<>();
-            for(int i = 0; i < this.size; i++){
-                for(int j = 0; i < this.size; j++){
-                    allCoordinates.add(new Coordinates(i,j));
-                }
-            } 
-        }
-        //give all possible moves to all pieces
-        for(ChessPiece[] row : this.board){
-            for(ChessPiece piece : row){
-                if (piece != null) {
-                    piece.setLegalMoves(allCoordinates); 
-                    piece.setAvailableMoves(allCoordinates);
-                } 
-            }
-        }
-        
-    }
-    
-    //for manual game setup
+ 
+    /**
+     * Move piece anywhere on the board - for manual set up
+     * @param startPos initial position of moving piece
+     * @param dest destination of moving piece
+     */
     public void movePieceAnywhere(Coordinates startPos, Coordinates dest){
         
         if(this.getChessPieceAtCoordinate(startPos) == null){
@@ -251,7 +262,11 @@ public class Board {
         }
     }
     
-    //Do the moves, controll special moves can be played
+    /**
+     * Move the piece on the board according to chess rules
+     * @param startPos initial position of the moving piece
+     * @param dest destination of the moving piece
+     */
     public void movePiece(Coordinates startPos, Coordinates dest){
         
         //help for notation
@@ -283,22 +298,20 @@ public class Board {
             //TODO - NAIVE IMPLEMENTATION - make it beter next time (generalize)
             for(Coordinates newKingCoord : castleLocations){
                 if(newKingCoord.equals(dest)){
-                    
+                    int rookY = 7;
+                    ChessPiece rook = this.getChessPieceAtCoordinate(new Coordinates(newKingCoord.getX(), rookY));
                     //king side
-                    if(dest.getY() == movingPiece.getPosition().getY() + distanceTraveledByKing){
-                        int rookY = 7;
-                        ChessPiece rook = this.getChessPieceAtCoordinate(new Coordinates(newKingCoord.getX(), rookY));
+                    if(rook != null && dest.getY() == movingPiece.getPosition().getY() + distanceTraveledByKing){
                         this.board[rook.getPosition().getX()][rook.getPosition().getY()] = null;
                         Coordinates rookDest = new Coordinates(newKingCoord.getX(), movingPiece.getPosition().getY() + distanceTraveledByKing - 1);
                         this.board[rookDest.getX()][rookDest.getY()] = rook;
                         rook.setPosition(rookDest);
                         castleK = true;
                     }
-                    
+                    rookY = 0;
+                    rook = this.getChessPieceAtCoordinate(new Coordinates(newKingCoord.getX(), rookY));
                     //Queen side
-                    if(dest.getY() == movingPiece.getPosition().getY() - distanceTraveledByKing){
-                        int rookY = 0;
-                        ChessPiece rook = this.getChessPieceAtCoordinate(new Coordinates(newKingCoord.getX(), rookY));
+                    if(rook != null && dest.getY() == movingPiece.getPosition().getY() - distanceTraveledByKing){
                         this.board[rook.getPosition().getX()][rook.getPosition().getY()] = null;
                         Coordinates rookDest = new Coordinates(newKingCoord.getX(), movingPiece.getPosition().getY() - distanceTraveledByKing + 1);
                         this.board[rookDest.getX()][rookDest.getY()] = rook;
@@ -341,7 +354,11 @@ public class Board {
         history.updatePgnNotation(this, takes, castleQ, castleK, promotion);
     }
     
-    //for generating future board states and recursion control
+    /**
+     * Help method for generating future states
+     * @param startPos initial position of the moving piece
+     * @param dest destination of the moving piece
+     */
     public void movePieceWithoutUpdatingLegalMoves(Coordinates startPos, Coordinates dest){
 
         //trying to move nonexistent piece
@@ -423,6 +440,12 @@ public class Board {
         updateChecks();
     }
     
+    /**
+     * 
+     * @param x rank coordinate
+     * @param y file coordinate
+     * @return returns chessPiece at given position returns null if postion is out of bounds
+     */
     public ChessPiece getChessPieceAtPosition(int x, int y){
         //check index out of bounds
         if(x >= this.size || y >= this.size || y<0 || x<0){
@@ -433,6 +456,12 @@ public class Board {
         }
     }
     
+    /**
+     * Method used for pawn promotion
+     * @param promoted piece that is to be promoted
+     * @param newRank rank the piece will be promoted to
+     * @return
+     */
     public ChessPiece promotion(ChessPiece promoted, ChessPiece newRank){
         Coordinates coords = promoted.getPosition();
         int id = promoted.getId();
@@ -454,7 +483,13 @@ public class Board {
         return promotedPiece;
     }
     
-    private ArrayList<ChessPiece> findUniques(ChessPiece[][] board){
+    /**
+     * find all unique chessPieces on the board
+     * @param board current state of the board
+     * @return  returns ArrayList of unique ChessPieces
+     */
+    
+    public ArrayList<ChessPiece> findUniques(ChessPiece[][] board){
         ArrayList<ChessPiece> unique = new ArrayList<>();
         for(ChessPiece[] row : board){
             for(ChessPiece piece : row){
@@ -478,23 +513,43 @@ public class Board {
         return unique;
     }
     
-    
+    /**
+     *
+     * @param coord coordinates on the board
+     * @return returns chessPiece at given coordinates
+     */
     public ChessPiece getChessPieceAtCoordinate(Coordinates coord){
         return this.getChessPieceAtPosition(coord.getX(), coord.getY());
     }
     
+    /**
+     *
+     * @return returns board size
+     */
     public int getSize() {
         return size;
     }
 
+    /**
+     *
+     * @return returns board piece arrangement
+     */
     public ChessPiece[][] getBoard() {
         return board;
     }
 
+    /**
+     *
+     * @return returns board move history
+     */
     public TurnHistory getHistory() {
         return history;
     }
     
+    /**
+     *
+     * @return returns unique pieces present on the board
+     */
     public ArrayList<ChessPiece> getUniquePieces() {
         return uniquePieces;
     }

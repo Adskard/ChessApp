@@ -1,9 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -11,15 +8,16 @@ import java.awt.image.*;
 import javax.imageio.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 /**
- *
+ * BoardView is a class of view and is a java.swing window application.
+ * It displays the game board and is responsible for displaying the current state of the game and listening for user input.
  * @author Adam Škarda
  */
 public class BoardView{
@@ -39,13 +37,22 @@ public class BoardView{
     private final ArrayList<JButton> availableSquares;
     private Coordinates chosenSquareCoords = null;
     private boolean redraw = false;
+
+    /**
+     * flag for when boardView is ready visible
+     */
     public boolean ready = false;
     private JFileChooser saveDialog;
     private boolean manual = false;
     private JButton manualSetUpDoneButton;
     private JPanel optionsPanel;
-    private final Logger logger = Logger.getLogger(BoardView.class.getName());
+    private static final Logger logger = Logger.getLogger(BoardView.class.getName());
     
+    /**
+     * Constructor used for viewing Pgn games 
+     * @param game game for the view to display
+     * @param control controller connection
+     */
     public BoardView(Game game, ChessController control) {
         this.modelGame = game;
         this.modelBoard = game.getGameBoard();
@@ -57,6 +64,10 @@ public class BoardView{
         this.ready = true;
     }
     
+    /**
+     * Constructor for playing games
+     * @param game game for the view to display
+     */
     public BoardView(Game game) {
         this.modelGame = game;
         this.modelBoard = game.getGameBoard();
@@ -67,6 +78,10 @@ public class BoardView{
         this.ready = true;
     }
     
+    
+    /**
+     * initializes frame and frame componetns for pgn viewing
+     */
     private void initPgnViewing(){
         //create main frame
         frame = new JFrame();
@@ -114,19 +129,28 @@ public class BoardView{
         p1 = new JPanel(new FlowLayout(0, 100, 20)); // panel with player name, time, pieces lost
         p2 = new JPanel(new FlowLayout(0, 100, 20)); // panel with player name, time, pieces lost
         
-        JLabel p1Name = new JLabel(modelGame.getPlayers().get(0).getName());
-        JLabel p2Name = new JLabel(modelGame.getPlayers().get(1).getName());
+        JLabel p1Name = new JLabel(modelGame.getPlayers().get(1).getName() + "(" + modelGame.getPlayers().get(1).getColor() + ")");
+        JLabel p2Name = new JLabel(modelGame.getPlayers().get(0).getName() + "(" + modelGame.getPlayers().get(0).getColor() + ")");
         p1.add(p1Name);
-        p2.add(p2Name);
+        p1.add(p2Name);
         
         initBoardSquares();
         frame.add(p1, BorderLayout.PAGE_START);
         frame.add(chessBoard, BorderLayout.CENTER);
-        frame.add(p2, BorderLayout.PAGE_END);
         frame.add(optionsPanel, BorderLayout.LINE_END);
         frame.setVisible(true);
     }
     
+    /**
+     * @param result result text to be displayed
+     */
+    public void addResultText(String result){
+        this.p1.add(new JLabel(result));
+    }
+    
+    /**
+     * @param modelBoard board to be displayed
+     */
     private void displayBoard(ChessPiece[][] modelBoard){
         for (int i = 0; i < boardSquares.length; i++) {  
             for (int j = 0; j < boardSquares[i].length; j++) {
@@ -143,7 +167,7 @@ public class BoardView{
                       BufferedImage image = ImageIO.read(new File(fullImagePath));  
                       square.setIcon(new ImageIcon(image));
                     }
-                    catch(Exception e){
+                    catch(IOException e){
                         logger.log(Level.SEVERE, "Could not laod Chess piece image {0}", e.getMessage());
                     }  
                 }
@@ -154,6 +178,11 @@ public class BoardView{
         }
     }
     
+    /**
+     * moves the piece in model based on user input (clicked squares)
+     * @param source source square of the move (first click)
+     * @param dest destination square of the move (second click)
+     */
     private void moveChessPiece(Coordinates source, Coordinates dest){
         //model changes
         this.modelBoard.movePiece(source, dest);
@@ -172,11 +201,19 @@ public class BoardView{
         this.currentPlayer.setFinishedTurn(true);
     }
     
+    /**
+     * @param source source square of the move (first click)
+     * @param dest destination square of the move (second click)
+     */
     private void manualMoveChessPiece(Coordinates source, Coordinates dest){
         this.modelBoard.movePieceAnywhere(source, dest);
         repaintFromModel();
     }
     
+    /**
+     * displays pop-up window for promotion choosing
+     * @return returns chosen promotion
+     */
     private ChessPiece promotionPopUp(){
         //get options for promotions
         ArrayList<ChessPiece> options = new ArrayList();
@@ -192,6 +229,7 @@ public class BoardView{
             JOptionPane.PLAIN_MESSAGE,null,possibilities,possibilities[0]);
         return answer;
     }
+    
     
     private class userMoveInputHandler implements ActionListener{
         
@@ -252,16 +290,24 @@ public class BoardView{
         }
     }
     
-    
+    /**
+     * updates chess clock display for players
+     */
     public void updateClocks(){
         P1Time.setText(modelGame.getPlayers().get(0).getChessClock().getRemainingSeconds());
         P2Time.setText(modelGame.getPlayers().get(1).getChessClock().getRemainingSeconds());
     }
     
+    /**
+     * updates history display for game 
+     */
     private void updateHistory(){
         history.setListData(modelGame.getGameBoard().getHistory().getMovesInPgn().toArray());
     }
     
+    /**
+     * repaints board from model
+     */
     public void repaintFromModel(){
         if (manual) {
             if (manualSetUpDoneButton == null) {
@@ -297,7 +343,7 @@ public class BoardView{
                       BufferedImage image = ImageIO.read(new File(fullImagePath));  
                       square.setIcon(new ImageIcon(image));
                     }
-                    catch(Exception e){
+                    catch(IOException e){
                         logger.log(Level.SEVERE, "Could not laod Chess piece image {0}", e.getMessage());
                     }  
                 }
@@ -308,7 +354,9 @@ public class BoardView{
         }
     }
     
-    
+    /**
+     * Updates square highlights of available moves
+     */
     private void updateAvailableMovesView(){
         //repaint squares bach to original
         if(redraw){
@@ -327,7 +375,9 @@ public class BoardView{
         }
     }
     
-    
+    /**
+     * initializes boardView components based on information form model
+     */
     private void initComponents(){
         //create main frame
         frame = new JFrame();
@@ -365,8 +415,8 @@ public class BoardView{
         p1 = new JPanel(new FlowLayout(0, 100, 20)); // panel with player name, time, pieces lost
         p2 = new JPanel(new FlowLayout(0, 100, 20)); // panel with player name, time, pieces lost
         
-        JLabel p1Name = new JLabel(modelGame.getPlayers().get(0).getName());
-        JLabel p2Name = new JLabel(modelGame.getPlayers().get(1).getName());
+        JLabel p1Name = new JLabel(modelGame.getPlayers().get(1).getName() + "(" + modelGame.getPlayers().get(1).getColor() + ")");
+        JLabel p2Name = new JLabel(modelGame.getPlayers().get(0).getName() + "(" + modelGame.getPlayers().get(0).getColor() + ")") ;
         p1.add(p1Name);
         p2.add(p2Name);
         
@@ -383,14 +433,25 @@ public class BoardView{
         frame.setVisible(true);
     }
 
+    /**
+     *
+     * @return returns current player who can move pieces
+     */
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
 
+    /**
+     * Sets current player who can move pieces
+     * @param currentPlayer
+     */
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
     
+    /**
+     * Initializes game board (squares) base on information from modelBoard
+     */
     private void initBoardSquares(){
         chessBoard = new JPanel(new GridLayout(0,modelBoard.getSize() + 1));
         //alloting squares to chessBoard, where board squares are JButtons and coordinates are lables      
@@ -456,6 +517,11 @@ public class BoardView{
         }
     }
     
+    /**
+     * Shows winner pop-up window for options
+     * @param resultMsg end of game message
+     * @return returns booleans for export game dialog
+     */
     public boolean showWinnerWindow(String resultMsg){
         //two options to choose from
         String[] options = new String[2];
@@ -481,6 +547,10 @@ public class BoardView{
         return false;
     }
     
+    /**
+     * 
+     * @return returns result of saveDialog - that is path to save file
+     */
     public String showSaveDialog(){
         int k = saveDialog.showSaveDialog(frame);
         if (k != JFileChooser.APPROVE_OPTION) {
@@ -490,18 +560,34 @@ public class BoardView{
         return path;
     }
 
+    /**
+     *
+     * @return returns manual flag
+     */
     public boolean isManual() {
         return manual;
     }
 
+    /**
+     * Sets manual flag
+     * @param manual
+     */
     public void setManual(boolean manual) {
         this.manual = manual;
     }
 
+    /**
+     * 
+     * @return returns controller of this view
+     */
     public ChessController getController() {
         return controller;
     }
 
+    /**
+     * Sets controller of this class
+     * @param controller 
+     */
     public void setController(ChessController controller) {
         this.controller = controller;
     }

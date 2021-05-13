@@ -1,21 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
 
+import java.util.*;
 /**
- *
+ * Game is a class that describes the state of the game - board state and players.
  * @author Adam Škarda
  */
-import java.util.*;
-
 public class Game {
     private final Board gameBoard;
     private final ArrayList<Player> players;
     private final ChessStyle style;
 
+    /**
+     * Constructor
+     * @param style style in which the game is played dictates the board
+     * @param players players who play the game
+     */
     public Game(ChessStyle style, ArrayList<Player> players) {
         this.style = style;
         this.gameBoard = new Board(this.style.getBoardSize(),this.style.getBoardArrangement());
@@ -23,19 +23,27 @@ public class Game {
         this.players = players;
     }
 
-
-    public void retraceGameHistory(int stepToRetrace){
-        
-    }
     
+    /**
+     * 
+     * @return returns game Board
+     */
     public Board getGameBoard() {
         return gameBoard;
     }
 
+    /**
+     *
+     * @return returns games players
+     */
     public ArrayList<Player> getPlayers() {
         return players;
     }
 
+    /**
+     *
+     * @return returns game style
+     */
     public ChessStyle getStyle() {
         return style;
     }

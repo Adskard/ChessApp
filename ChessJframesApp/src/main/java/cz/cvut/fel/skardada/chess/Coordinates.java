@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.cvut.fel.skardada.chess;
 
 /**
@@ -14,16 +10,22 @@ public class Coordinates implements java.io.Serializable{
     private final int y;
     private final int offset;
     /**
-     *
-     * @param x
-     * @param y
+     * Creates a serializable object that stores coordinates
+     * 
+     * @param x Row/rank number starting from 0
+     * @param y Column/file number starting from 0
      */
     public Coordinates(int x,int y) {
         this.x = x; //row
         this.y = y; //column
         this.offset = 97; //char offset
     }
-    
+    /**
+     * Creates a serializable object that stores coordinates
+     * 
+     * @param pgn Pgn notation of coordinate (eg. d2)
+     * @throws Exception if the supplied pgn isnt of proper lenght (2)
+     */
     public Coordinates(String pgn) throws Exception{
         this.offset = 97;
         if(pgn.length() != 2){
@@ -37,7 +39,7 @@ public class Coordinates implements java.io.Serializable{
 
     /**
      *
-     * @return
+     * @return String representation of Coordinates as file + rank 
      */
     @Override
     public String toString(){
@@ -48,7 +50,7 @@ public class Coordinates implements java.io.Serializable{
 
     /**
      *
-     * @return
+     * @return Unique hash for these Coordinates
      */
     @Override
     public int hashCode(){
@@ -57,8 +59,8 @@ public class Coordinates implements java.io.Serializable{
 
     /**
      *
-     * @param o
-     * @return
+     * @param o Compared object
+     * @return Returns true if the coordinates are identical, else false
      */
     @Override
     public boolean equals(Object o){
@@ -75,18 +77,26 @@ public class Coordinates implements java.io.Serializable{
         return false;
     }
     
+    /**
+     *
+     * @return String representation of coordinate rank
+     */
     public String getRank(){
         return Integer.toString(this.x+1);
     }
     
+    /**
+     *
+     * @return String representation of coordinate file
+     */
     public String getFile(){
         return Character.toString((char)(offset + this.y));
     }
 
     /**
      *
-     * @param added coordinate object to be added
-     * @return new Coordinate objact that is sum of this and added Coordinates
+     * @param added Coordinate object to be added
+     * @return New Coordinate object that is sum of this and added Coordinates
      */
     public Coordinates getSum(Coordinates added){
         Coordinates result = new Coordinates(this.x+added.getX(),this.y+added.getY());
@@ -95,8 +105,8 @@ public class Coordinates implements java.io.Serializable{
     
     /**
      *
-     * @param number coordinate multiplier
-     * @return new Coordinate object that is a product of original * number
+     * @param number Coordinate multiplier
+     * @return New Coordinate object that is a product of original * number
      */
     public Coordinates getProduct(int number){
         return new Coordinates(this.x*number,this.y*number);
@@ -104,8 +114,8 @@ public class Coordinates implements java.io.Serializable{
 
     /**
      *
-     * @param boardSize size of game board
-     * @return coordinate integer representation
+     * @param boardSize Size of game board
+     * @return Coordinate integer representation for coordinates
      */
     public int getIntRepr(int boardSize){
         return this.x + this.y * boardSize;
@@ -113,7 +123,7 @@ public class Coordinates implements java.io.Serializable{
 
     /**
      *
-     * @return x coordinate
+     * @return X coordinate - represented by integer
      */
     public int getX() {
         return x;
@@ -121,7 +131,7 @@ public class Coordinates implements java.io.Serializable{
 
     /**
      *
-     * @return y coordinate
+     * @return Y coordinate - represented by integer
      */
     public int getY() {
         return y;

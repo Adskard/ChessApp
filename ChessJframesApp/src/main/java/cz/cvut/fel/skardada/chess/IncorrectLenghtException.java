@@ -6,11 +6,15 @@
 package cz.cvut.fel.skardada.chess;
 
 /**
- *
+ * exception for incorrect board lenght
  * @author Adam Škarda
  */
 public class IncorrectLenghtException extends Exception{
 
+    /**
+     *
+     * @param message message to be displayed
+     */
     public IncorrectLenghtException(String message) {
         super(message);
     }
